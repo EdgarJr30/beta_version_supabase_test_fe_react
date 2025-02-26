@@ -42,7 +42,8 @@ const Navbar = () => {
             {/* Logo y botón de menú en móviles */}
             <div className="bg-white p-2 flex justify-between sm:justify-center items-center border-b border-gray-300">
                 <img src="https://placehold.co/200x60?text=Company+Logo" alt="Company Logo" className="h-12" />
-                
+
+
                 {/* Botón de menú hamburguesa en móviles */}
                 <button
                     className="sm:hidden text-blue-600 p-2"
@@ -51,6 +52,7 @@ const Navbar = () => {
                     {isMobileMenuOpen ? "✖️" : "☰"}
                 </button>
             </div>
+            <p className="text-red-600 flex justify-center items-center">This is a beta version app 0.0.1</p>
 
             {/* Menú principal */}
             <div className={`bg-blue-600 p-2 ${isMobileMenuOpen ? "block" : "hidden"} sm:flex sm:items-center sm:justify-between`}>

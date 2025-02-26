@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
 
     return (
         <footer className="bg-gray-800 text-white text-center p-4 mt-6">
-            <p>Tejada Tech Group S.A. © {currentYear}. All Rights Reserved. Beta version</p>
+            <p>Tejada Tech Group S.A. © {currentYear}. All Rights Reserved. Beta version 0.0.1</p>
         </footer>
     );
 };

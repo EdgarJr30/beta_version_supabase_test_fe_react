@@ -32,6 +32,7 @@ export default function Login() {
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="p-8 bg-white shadow-lg rounded-lg w-96">
                 <h2 className="text-2xl font-bold text-center mb-6">Iniciar Sesión</h2>
+                <p className="text-red-600 flex justify-center items-center">This is a beta version app 0.0.1</p>
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
                 <form onSubmit={handleLogin} className="space-y-4">
                     <input
