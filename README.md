@@ -114,9 +114,27 @@ npm test
 📌 Considera implementar manejo de estado global si la aplicación crece.  
 📌 Verifica regularmente las configuraciones de seguridad en Supabase.  
 
+## 🌐 Link de la Demo
+
+[Acceder a la demo](https://betafereact.netlify.app/login)
+
+## 👤 Usuarios de Prueba Según Roles
+
+- **Admin**  
+  - Usuario: `admin@demo.com`  
+  - Contraseña: `admin`  
+
+- **User**  
+  - Usuario: `user@demo.com`  
+  - Contraseña: `user`  
+
+- **Testing**  
+  - Usuario: `testing@demo.com`  
+  - Contraseña: `testing` 
+
 ## 📜 Aviso de Copyright y Confidencialidad
 
-© 2025, Tejada Tech Group. Todos los derechos reservados.
+© 2025, MoonCode. Todos los derechos reservados.
 
 Este proyecto y todo su contenido son propiedad exclusiva del equipo de desarrollo. Está estrictamente prohibido copiar, reproducir, distribuir, modificar o divulgar este proyecto sin autorización previa.
 
