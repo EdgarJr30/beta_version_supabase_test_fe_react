@@ -2,66 +2,66 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 
-interface EmisionComprobante {
-  id: number;
-  root_tag: string;
-  rnc_emisor: string;
-  rnc_comprador: string;
-  fecha_emision: string;
-  tipo_ecf: string;
-  es_rfc: boolean;
-  encf: string;
-  monto_total: number;
-  fecha_firma: string;
-  codigo_seguridad: string;
-  dgii_filename: string;
-  created_at: string;
-}
-
 // interface EmisionComprobante {
 //   id: number;
-//   emisor_rnc: string;
-//   emisor_razon_social: string;
-//   receptor_rnc: string;
-//   receptor_razon_social: string;
-//   numero_documento: string;
-//   tipo_documento: string;
+//   root_tag: string;
+//   rnc_emisor: string;
+//   rnc_Receptor: string;
+//   fecha_emision: string;
 //   tipo_ecf: string;
 //   es_rfc: boolean;
-//   fecha_emision: string;
-//   subtotal_sin_impuestos: number;
-//   total_impuesto: number;
-//   itbis: number;
-//   importe_total: number;
-//   dgii_filename: string;
-//   dgii_estado: string;
-//   dgii_mensaje_respuesta: string;
-//   track_id: string;
-//   fecha_autorizacion: string;
+//   encf: string;
+//   monto_total: number;
 //   fecha_firma: string;
 //   codigo_seguridad: string;
-//   url_consulta_qr: boolean;
-//   document_xml: string;
-//   acuse_recibo_estado: number;
-//   acuse_recibo_json: number;
-//   aprobacion_comercial_estado: number;
-//   aprobacion_comercial_json: string;
-//   numero_documento_sustento: string;
-//   secuencial_erp: string;
-//   codigo_erp: string;
-//   usuario_erp: boolean;
-//   fecha_reproceso: string;
-//   destinatarios: number;
-//   created_at: number;
-//   rfc_xml: number;
+//   dgii_filename: string;
+//   created_at: string;
 // }
+
+interface EmisionComprobante {
+  id: number;
+  emisor_rnc: string;
+  emisor_razon_social: string;
+  receptor_rnc: string;
+  receptor_razon_social: string;
+  numero_documento: string;
+  tipo_documento: string;
+  tipo_ecf: string;
+  es_rfc: boolean;
+  fecha_emision: string;
+  subtotal_sin_impuestos: number;
+  total_impuesto: number;
+  itbis: number;
+  importe_total: number;
+  dgii_filename: string;
+  dgii_estado: string;
+  dgii_mensaje_respuesta: string;
+  track_id: string;
+  fecha_autorizacion: string;
+  fecha_firma: string;
+  codigo_seguridad: string;
+  url_consulta_qr: boolean;
+  document_xml: string;
+  acuse_recibo_estado: number;
+  acuse_recibo_json: number;
+  aprobacion_comercial_estado: number;
+  aprobacion_comercial_json: string;
+  numero_documento_sustento: string;
+  secuencial_erp: string;
+  codigo_erp: string;
+  usuario_erp: boolean;
+  fecha_reproceso: string;
+  destinatarios: number;
+  created_at: number;
+  rfc_xml: number;
+}
 
 const EmisionComprobantes: React.FC = () => {
   const { roles } = useAuth();
   const [comprobantes, setComprobantes] = useState<EmisionComprobante[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [rncComprador, setRncComprador] = useState("");
+  const [rncReceptor, setRncReceptor] = useState("");
   const [tipoEcf, setTipoEcf] = useState("Todos");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -70,7 +70,7 @@ const EmisionComprobantes: React.FC = () => {
     if (roles === "admin" || roles === "user") {
       fetchComprobantes();
     } else {
-      setLoading(false); 
+      setLoading(false);
     }
   }, [roles]);
 
@@ -79,9 +79,15 @@ const EmisionComprobantes: React.FC = () => {
     const { data, error } = await supabase
       .from("emision_comprobantes")
       .select(`
-        id, root_tag, rnc_emisor, rnc_comprador, fecha_emision,
-        tipo_ecf, es_rfc, encf, monto_total, fecha_firma,
-        codigo_seguridad, dgii_filename, created_at
+        "id","emisor_rnc", "emisor_razon_social", "receptor_rnc", "receptor_razon_social", 
+        "numero_documento", "tipo_documento", "tipo_ecf", "es_rfc", "fecha_emision", 
+        "subtotal_sin_impuestos", "total_impuesto", "itbis", "importe_total", 
+        "dgii_filename", "dgii_estado", "dgii_mensaje_respuesta", "track_id", 
+        "fecha_autorizacion", "fecha_firma", "codigo_seguridad", "url_consulta_qr", 
+        "document_xml", "acuse_recibo_estado", "acuse_recibo_json", 
+        "aprobacion_comercial_estado", "aprobacion_comercial_json", 
+        "numero_documento_sustento", "secuencial_erp", "codigo_erp", "usuario_erp", 
+        "fecha_reproceso", "destinatarios", "created_at", "rfc_xml"
       `);
 
     if (error) {
@@ -94,8 +100,8 @@ const EmisionComprobantes: React.FC = () => {
 
   const filteredComprobantes = comprobantes.filter((item) => {
     return (
-      (!searchTerm || item.encf.includes(searchTerm)) &&
-      (!rncComprador || item.rnc_comprador.includes(rncComprador)) &&
+      (!searchTerm || item.numero_documento.includes(searchTerm)) &&
+      (!rncReceptor || item.receptor_rnc.includes(rncReceptor)) &&
       (tipoEcf === "Todos" || item.tipo_ecf === tipoEcf)
     );
   });
@@ -120,11 +126,11 @@ const EmisionComprobantes: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">RNC Comprador</label>
+            <label className="block text-sm font-medium text-gray-700">RNC Receptor</label>
             <input
               type="text"
-              value={rncComprador}
-              onChange={(e) => setRncComprador(e.target.value)}
+              value={rncReceptor}
+              onChange={(e) => setRncReceptor(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
             />
           </div>
@@ -168,9 +174,34 @@ const EmisionComprobantes: React.FC = () => {
                   <th className="p-3 border">Razón Social Receptor</th>
                   <th className="p-3 border">Num Documento</th>
                   <th className="p-3 border">Tipo Documento</th>
-                  <th className="p-3 border">Estado Emisión</th>
+                  <th className="p-3 border">Tipo ECF</th>
+                  <th className="p-3 border">Es RFC</th>
                   <th className="p-3 border">Fecha Emisión</th>
-                  <th className="p-3 border">Fecha Auto</th>
+                  <th className="p-3 border">Subtotal Sin Impuestos</th>
+                  <th className="p-3 border">Total Impuesto</th>
+                  <th className="p-3 border">ITBIS</th>
+                  <th className="p-3 border">Importe Total</th>
+                  <th className="p-3 border">DGII Filename</th>
+                  <th className="p-3 border">Estado Emisión</th>
+                  <th className="p-3 border">Mensaje Respuesta DGII</th>
+                  <th className="p-3 border">Track ID</th>
+                  <th className="p-3 border">Fecha Autorización</th>
+                  <th className="p-3 border">Fecha Firma</th>
+                  <th className="p-3 border">Código Seguridad</th>
+                  <th className="p-3 border">URL Consulta QR</th>
+                  <th className="p-3 border">Documento XML</th>
+                  <th className="p-3 border">Acuse Recibo Estado</th>
+                  <th className="p-3 border">Acuse Recibo JSON</th>
+                  <th className="p-3 border">Aprobación Comercial Estado</th>
+                  <th className="p-3 border">Aprobación Comercial JSON</th>
+                  <th className="p-3 border">Número Documento Sustento</th>
+                  <th className="p-3 border">Secuencial ERP</th>
+                  <th className="p-3 border">Código ERP</th>
+                  <th className="p-3 border">Usuario ERP</th>
+                  <th className="p-3 border">Fecha Reproceso</th>
+                  <th className="p-3 border">Destinatarios</th>
+                  <th className="p-3 border">Fecha Creación</th>
+                  <th className="p-3 border">RFC XML</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,15 +210,40 @@ const EmisionComprobantes: React.FC = () => {
                     <td className="p-3 text-center">
                       <button className="text-xl">⋮</button>
                     </td>
-                    <td className="p-3">{item.rnc_emisor}</td>
-                    <td className="p-3 truncate">Operadora de Servicios Alimenticios LM, SRL</td>
-                    <td className="p-3">{item.rnc_comprador}</td>
-                    <td className="p-3 truncate">Proveedor Esporádico</td>
-                    <td className="p-3">{item.encf}</td>
+                    <td className="p-3">{item.emisor_rnc}</td>
+                    <td className="p-3 truncate">{item.emisor_razon_social}</td>
+                    <td className="p-3">{item.receptor_rnc}</td>
+                    <td className="p-3 truncate">{item.receptor_razon_social}</td>
+                    <td className="p-3">{item.numero_documento}</td>
+                    <td className="p-3">{item.tipo_documento}</td>
                     <td className="p-3">{item.tipo_ecf}</td>
-                    <td className="p-3 text-green-600 font-bold">Autorizado</td>
+                    <td className="p-3">{item.es_rfc ? "Sí" : "No"}</td>
                     <td className="p-3">{item.fecha_emision}</td>
+                    <td className="p-3">{item.subtotal_sin_impuestos.toFixed(2)}</td>
+                    <td className="p-3">{item.total_impuesto.toFixed(2)}</td>
+                    <td className="p-3">{item.itbis.toFixed(2)}</td>
+                    <td className="p-3">{item.importe_total.toFixed(2)}</td>
+                    <td className="p-3">{item.dgii_filename}</td>
+                    <td className="p-3 text-green-600 font-bold">{item.dgii_estado}</td>
+                    <td className="p-3 truncate">{item.dgii_mensaje_respuesta}</td>
+                    <td className="p-3">{item.track_id}</td>
+                    <td className="p-3">{item.fecha_autorizacion}</td>
                     <td className="p-3">{item.fecha_firma}</td>
+                    <td className="p-3">{item.codigo_seguridad}</td>
+                    <td className="p-3">{item.url_consulta_qr}</td>
+                    <td className="p-3 truncate">{item.document_xml}</td>
+                    <td className="p-3">{item.acuse_recibo_estado}</td>
+                    <td className="p-3 truncate">{item.acuse_recibo_json}</td>
+                    <td className="p-3">{item.aprobacion_comercial_estado}</td>
+                    <td className="p-3 truncate">{item.aprobacion_comercial_json}</td>
+                    <td className="p-3">{item.numero_documento_sustento}</td>
+                    <td className="p-3">{item.secuencial_erp}</td>
+                    <td className="p-3">{item.codigo_erp}</td>
+                    <td className="p-3">{item.usuario_erp ? "Sí" : "No"}</td>
+                    <td className="p-3">{item.fecha_reproceso}</td>
+                    <td className="p-3">{item.destinatarios}</td>
+                    <td className="p-3">{item.created_at}</td>
+                    <td className="p-3">{item.rfc_xml}</td>
                   </tr>
                 ))}
               </tbody>
@@ -197,7 +253,7 @@ const EmisionComprobantes: React.FC = () => {
           {/* Paginación */}
           <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2">
             <span className="text-center sm:text-left">
-              Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, filteredComprobantes.length)} - 
+              Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, filteredComprobantes.length)} -
               {Math.min(currentPage * itemsPerPage, filteredComprobantes.length)} de {filteredComprobantes.length}
             </span>
             <div className="flex gap-2">
