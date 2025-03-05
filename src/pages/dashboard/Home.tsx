@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <div className="bg-white p-6 md:p-8 lg:p-10 space-y-6">
-      {/* Contenedor principal, mantiene el tamaño original en desktop */}
+      {/* Contenedor principal*/}
       <div className="bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-md mx-auto w-full max-w-5xl">
         {/* Encabezado */}
         <div className="bg-blue-500 text-white p-4 rounded-t-lg text-center sm:text-left">
@@ -45,7 +45,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* MÉTRICAS - Alineación corregida */}
+      {/* MÉTRICAS*/}
       <div className="mt-6 text-center sm:text-left w-full max-w-5xl mx-auto px-6 md:px-8 lg:px-10">
         <h3 className="font-semibold text-xl">Métricas de hoy, {getFormattedDate()} </h3>
         <div className="mt-4 h-72 bg-gray-200 rounded-md"></div>

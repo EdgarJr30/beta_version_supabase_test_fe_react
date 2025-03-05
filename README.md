@@ -2,7 +2,7 @@
 
 ## 📌 Descripción
 
-Este proyecto es una aplicación web basada en React y Supabase, que implementa autenticación, restricción de rutas según roles de usuario y almacenamiento de sesiones mediante Context Provider. Se ha desarrollado siguiendo buenas prácticas para garantizar un código modular y mantenible.
+Este proyecto es una aplicación web basada en React y Supabase, que implementa autenticación, restricción de rutas según roles de usuario y almacenamiento de sesiones mediante Context Provider.
 
 ## 🛠️ Requisitos Previos
 

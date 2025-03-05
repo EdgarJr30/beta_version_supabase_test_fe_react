@@ -2,22 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 
-// interface EmisionComprobante {
-//   id: number;
-//   root_tag: string;
-//   rnc_emisor: string;
-//   rnc_Receptor: string;
-//   fecha_emision: string;
-//   tipo_ecf: string;
-//   es_rfc: boolean;
-//   encf: string;
-//   monto_total: number;
-//   fecha_firma: string;
-//   codigo_seguridad: string;
-//   dgii_filename: string;
-//   created_at: string;
-// }
-
 interface EmisionComprobante {
   id: number;
   emisor_rnc: string;
@@ -64,6 +48,7 @@ const EmisionComprobantes: React.FC = () => {
   const [rncReceptor, setRncReceptor] = useState("");
   const [tipoEcf, setTipoEcf] = useState("Todos");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -110,6 +95,10 @@ const EmisionComprobantes: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleToggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
   return (
     <div className="bg-gray-100 p-4 sm:p-6 md:p-8">
@@ -162,7 +151,7 @@ const EmisionComprobantes: React.FC = () => {
         <div className="text-center text-gray-500">Cargando comprobantes...</div>
       ) : (
         <>
-          {/* Tabla - Ahora con scroll en móviles */}
+          {/* Tabla */}
           <div className="bg-white shadow-md rounded-lg overflow-x-auto">
             <table className="min-w-full text-sm border-collapse">
               <thead className="bg-gray-200 text-gray-700">
@@ -208,7 +197,7 @@ const EmisionComprobantes: React.FC = () => {
                 {paginatedComprobantes.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-100 border-b">
                     <td className="p-3 text-center">
-                      <button className="text-xl">⋮</button>
+                      <button onClick={() => handleToggleModal()} className="text-xl">...</button>
                     </td>
                     <td className="p-3">{item.emisor_rnc}</td>
                     <td className="p-3 truncate">{item.emisor_razon_social}</td>
@@ -261,6 +250,48 @@ const EmisionComprobantes: React.FC = () => {
               <button onClick={() => setCurrentPage((prev) => prev + 1)} className="px-4 py-2 bg-gray-300 rounded-md">Siguiente</button>
             </div>
           </div>
+          
+          {/* Modal */}
+          {isModalOpen && (
+            <div
+              className="absolute left-8 top-1 z-10 bg-white border rounded-lg shadow-lg w-48"
+              onClick={handleToggleModal}
+            >
+              <div
+                className="bg-white rounded-lg shadow-lg w-64 p-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="space-y-3">
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">
+                    Descargar PDF
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-green-500">
+                    Descargar XML
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-orange-500">
+                    Ver Request
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-yellow-500">
+                    Ver Response
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500">
+                    Reenviar
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-indigo-500">
+                    Consultar en DGII
+                  </li>
+                </div>
+                <div className="mt-3 text-center">
+                  <button
+                    onClick={handleToggleModal}
+                    className="text-blue-500 hover:text-blue-700 text-sm"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -30,7 +30,7 @@ export default function Register() {
 
     console.log("✅ Usuario creado en auth.users:", data);
 
-    // 2️⃣ Insertar usuario en public.users con el mismo UUID
+    // Insertar usuario en public.users con el mismo UUID
     const { user } = data;
     if (user) {
       const { error: userError } = await supabase
