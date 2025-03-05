@@ -18,6 +18,44 @@ interface EmisionComprobante {
   created_at: string;
 }
 
+// interface EmisionComprobante {
+//   id: number;
+//   emisor_rnc: string;
+//   emisor_razon_social: string;
+//   receptor_rnc: string;
+//   receptor_razon_social: string;
+//   numero_documento: string;
+//   tipo_documento: string;
+//   tipo_ecf: string;
+//   es_rfc: boolean;
+//   fecha_emision: string;
+//   subtotal_sin_impuestos: number;
+//   total_impuesto: number;
+//   itbis: number;
+//   importe_total: number;
+//   dgii_filename: string;
+//   dgii_estado: string;
+//   dgii_mensaje_respuesta: string;
+//   track_id: string;
+//   fecha_autorizacion: string;
+//   fecha_firma: string;
+//   codigo_seguridad: string;
+//   url_consulta_qr: boolean;
+//   document_xml: string;
+//   acuse_recibo_estado: number;
+//   acuse_recibo_json: number;
+//   aprobacion_comercial_estado: number;
+//   aprobacion_comercial_json: string;
+//   numero_documento_sustento: string;
+//   secuencial_erp: string;
+//   codigo_erp: string;
+//   usuario_erp: boolean;
+//   fecha_reproceso: string;
+//   destinatarios: number;
+//   created_at: number;
+//   rfc_xml: number;
+// }
+
 const EmisionComprobantes: React.FC = () => {
   const { roles } = useAuth();
   const [comprobantes, setComprobantes] = useState<EmisionComprobante[]>([]);
