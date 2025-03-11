@@ -1,4 +1,5 @@
 import React from "react";
+import AppVersion from "../AppVersion";
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
@@ -22,7 +23,7 @@ const Footer: React.FC = () => {
                         </a>
                     ))}
                 </div> */}
-                <p className="mt-10 text-center text-sm/6 text-gray-600"> &copy; {currentYear} Tejada Tech Group EIRL. All rights reserved. Beta version 0.0.1</p>
+                <p className="mt-10 text-center text-sm/6 text-gray-600"> &copy; {currentYear} Tejada Tech Group EIRL. All rights reserved. <AppVersion /></p>
             </div>
         </footer>
 

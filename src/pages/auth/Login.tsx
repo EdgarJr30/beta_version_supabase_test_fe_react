@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import AppVersion from '../../components/AppVersion';
 
 export default function Login() {
     const { session } = useAuth();
@@ -105,7 +106,7 @@ export default function Login() {
                         Contact Support!
                     </a>
                 </p>
-                <p className="text-red-600 flex justify-center items-center">This is a beta version app 0.0.1</p>
+                <AppVersion />
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
             </div>
         </div>

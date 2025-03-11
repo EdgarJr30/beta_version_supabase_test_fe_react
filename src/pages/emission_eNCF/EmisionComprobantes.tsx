@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
-
 interface EmisionComprobante {
   id: number;
   emisor_rnc: string;
@@ -101,7 +100,7 @@ const EmisionComprobantes: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 sm:p-6 md:p-8">
+    <div className="">
       {/* Filtros */}
       <div className="bg-white p-4 shadow-md rounded-lg mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -250,7 +249,7 @@ const EmisionComprobantes: React.FC = () => {
               <button onClick={() => setCurrentPage((prev) => prev + 1)} className="px-4 py-2 bg-gray-300 rounded-md">Siguiente</button>
             </div>
           </div>
-          
+
           {/* Modal */}
           {isModalOpen && (
             <div

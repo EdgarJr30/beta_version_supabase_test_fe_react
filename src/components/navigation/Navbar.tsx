@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
+import AppVersion from "../AppVersion";
 
 const Navbar = () => {
     const { signOut, roles } = useAuth();
@@ -52,7 +53,7 @@ const Navbar = () => {
                     {isMobileMenuOpen ? "✖️" : "☰"}
                 </button>
             </div>
-            <p className="text-red-600 flex justify-center items-center">This is a beta version app 0.0.1</p>
+            <AppVersion />
 
             {/* Menú principal */}
             <div className={`bg-blue-600 p-2 ${isMobileMenuOpen ? "block" : "hidden"} sm:flex sm:items-center sm:justify-between`}>
