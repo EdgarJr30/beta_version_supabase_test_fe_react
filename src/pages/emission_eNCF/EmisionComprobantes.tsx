@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
+import Pagination from '../../components/ui/Pagination';
 interface EmisionComprobante {
   id: number;
   emisor_rnc: string;
@@ -238,18 +239,6 @@ const EmisionComprobantes: React.FC = () => {
             </table>
           </div>
 
-          {/* Paginación */}
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2">
-            <span className="text-center sm:text-left">
-              Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, filteredComprobantes.length)} -
-              {Math.min(currentPage * itemsPerPage, filteredComprobantes.length)} de {filteredComprobantes.length}
-            </span>
-            <div className="flex gap-2">
-              <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} className="px-4 py-2 bg-gray-300 rounded-md">Anterior</button>
-              <button onClick={() => setCurrentPage((prev) => prev + 1)} className="px-4 py-2 bg-gray-300 rounded-md">Siguiente</button>
-            </div>
-          </div>
-
           {/* Modal */}
           {isModalOpen && (
             <div
@@ -291,6 +280,13 @@ const EmisionComprobantes: React.FC = () => {
               </div>
             </div>
           )}
+          {/* Paginación */}
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredComprobantes.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
         </>
       )}
     </div>
