@@ -92,7 +92,7 @@ const EmisionComprobantes: React.FC = () => {
     );
   });
 
-  const { paginatedData: paginatedComprobantes, currentPage, setCurrentPage, totalPages } =
+  const { paginatedData: paginatedComprobantes, currentPage, setCurrentPage } =
     usePagination({
       data: filteredComprobantes,
       itemsPerPage,

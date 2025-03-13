@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AppVersion from '../../components/AppVersion';
+import TurnstileCaptcha from '../../components/TurnstileCaptcha';
 
 export default function Login() {
     const { session } = useAuth();
@@ -10,6 +11,7 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     // Redirigir si ya está autenticado
     useEffect(() => {
@@ -22,10 +24,19 @@ export default function Login() {
         e.preventDefault();
         setError('');
 
+        // Validar que el usuario haya completado el captcha
+        if (!captchaToken) {
+            setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
+            return;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
             setError(error.message);
+        }
+        else {
+            console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
         }
     };
 
@@ -88,6 +99,11 @@ export default function Login() {
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             />
                         </div>
+                    </div>
+
+                    {/* Captcha */}
+                    <div>
+                        <TurnstileCaptcha onSuccess={setCaptchaToken} />
                     </div>
 
                     <div>
