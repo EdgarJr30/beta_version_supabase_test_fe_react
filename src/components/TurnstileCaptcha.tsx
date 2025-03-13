@@ -28,8 +28,8 @@ const TurnstileCaptcha = ({ onSuccess }: { onSuccess: (token: string) => void })
         // Callback de carga de Turnstile
         window.onloadTurnstileCallback = () => {
             if (window.turnstile && captchaRef.current) {
-                window.turnstile.render(captchaRef.current, { // 🔹 Usar `captchaRef.current` en lugar de `id`
-                    sitekey: "0x4AAAAAABAhG_v_BX_VVqKS", // 🛠 Reemplaza con tu clave de sitio de Cloudflare
+                window.turnstile.render(captchaRef.current, {
+                    sitekey: "0x4AAAAAABAhG_v_BX_VVqKS",
                     callback: (token: string) => {
                         console.log(`🔹 Captcha completado con éxito: ${token}`);
                         onSuccess(token);
@@ -41,14 +41,16 @@ const TurnstileCaptcha = ({ onSuccess }: { onSuccess: (token: string) => void })
         // Cargar el script si no está presente
         loadTurnstileScript();
 
+        const currentCaptchaRef = captchaRef.current;
+
         return () => {
-            if (window.turnstile && captchaRef.current) {
-                window.turnstile.remove(captchaRef.current); // 🔹 Usar el elemento, no su `id`
+            if (window.turnstile && currentCaptchaRef) {
+                window.turnstile.remove(currentCaptchaRef);
             }
         };
     }, [onSuccess]);
 
-    return <div ref={captchaRef}></div>; // 🔹 Se eliminó el `id="example-container"` porque no es necesario
+    return <div ref={captchaRef}></div>;
 };
 
 export default TurnstileCaptcha;
