@@ -42,15 +42,29 @@ interface EmisionComprobante {
   rfc_xml: number;
 }
 
+const tipoDocumentoOptions = [
+  "Todos",
+  "Factura de Crédito Fiscal Electrónica",
+  "Factura de Consumo Electrónica",
+  "Nota de Crédito Electrónica",
+  "Nota de Débito Electrónica",
+  "Compras Electrónico",
+  "Gastos Menores Electrónicos",
+  "Regímenes Especiales Electrónicos",
+  "Comprobante Gubernamental Electrónico",
+  "Comprobante de Exportaciones Electrónico",
+  "Comprobante de Pagos al Exterior Electrónico"
+];
+
 const EmisionComprobantes: React.FC = () => {
   const { roles } = useAuth();
   const [comprobantes, setComprobantes] = useState<EmisionComprobante[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [rncReceptor, setRncReceptor] = useState("");
-  const [tipoEcf, setTipoEcf] = useState("Todos");
+  const [tipoDocumento, setTipoDocumento] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const itemsPerPage = 8;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (roles === "admin" || roles === "user") {
@@ -88,7 +102,7 @@ const EmisionComprobantes: React.FC = () => {
     return (
       (!searchTerm || item.numero_documento.includes(searchTerm)) &&
       (!rncReceptor || item.receptor_rnc.includes(rncReceptor)) &&
-      (tipoEcf === "Todos" || item.tipo_ecf === tipoEcf)
+      (tipoDocumento === "Todos" || item.tipo_documento === tipoDocumento)
     );
   });
 
@@ -110,10 +124,53 @@ const EmisionComprobantes: React.FC = () => {
         setSearchTerm={setSearchTerm}
         rncReceptor={rncReceptor}
         setRncReceptor={setRncReceptor}
-        tipoEcf={tipoEcf}
-        setTipoEcf={setTipoEcf}
+        tipoDocumento={tipoDocumento}
+        setTipoDocumento={setTipoDocumento}
+        tipoDocumentoOptions={tipoDocumentoOptions}
         fetchComprobantes={fetchComprobantes}
       />
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div
+          className="absolute left-8 top-1 z-10 bg-white border rounded-lg shadow-lg w-48"
+          onClick={handleToggleModal}
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg w-64 p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="space-y-3">
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">
+                Descargar PDF
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-green-500">
+                Descargar XML
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-orange-500">
+                Ver Request
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-yellow-500">
+                Ver Response
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500">
+                Reenviar
+              </li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-indigo-500">
+                Consultar en DGII
+              </li>
+            </div>
+            <div className="mt-3 text-center">
+              <button
+                onClick={handleToggleModal}
+                className="text-blue-500 hover:text-blue-700 text-sm"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mostrar Cargando */}
       {loading ? (
@@ -184,13 +241,13 @@ const EmisionComprobantes: React.FC = () => {
                     <td className="p-2 border">{item.track_id}</td>
                     <td className="p-2 border">{item.secuencial_erp}</td>
                     <td className="p-2 border">{item.codigo_erp}</td>
-                    <td className="p-2 border">{item.usuario_erp ? "Sí" : "No"}</td>
+                    <td className="p-2 border">{item.usuario_erp}</td>
                     <td className="p-2 border truncate">{item.dgii_mensaje_respuesta}</td>
                     <td className="p-2 border">{item.fecha_reproceso}</td>
                     <td className="p-2 border">{item.destinatarios}</td>
                     <td className="p-2 border">{item.acuse_recibo_estado}</td>
                     {/* <td className="p-2 border">{item.tipo_ecf}</td> */}
-                    {/* <td className="p-2 border">{item.es_rfc ? "Sí" : "No"}</td> */}
+                    {/* <td className="p-2 border">{item.es_rfc }</td> */}
                     {/* <td className="p-2 border">{item.dgii_filename}</td> */}
                     {/* <td className="p-2 border">{item.fecha_firma}</td> */}
                     {/* <td className="p-2 border">{item.codigo_seguridad}</td> */}
@@ -207,48 +264,6 @@ const EmisionComprobantes: React.FC = () => {
               </tbody>
             </table>
           </div>
-
-          {/* Modal */}
-          {isModalOpen && (
-            <div
-              className="absolute left-8 top-1 z-10 bg-white border rounded-lg shadow-lg w-48"
-              onClick={handleToggleModal}
-            >
-              <div
-                className="bg-white rounded-lg shadow-lg w-64 p-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="space-y-3">
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">
-                    Descargar PDF
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-green-500">
-                    Descargar XML
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-orange-500">
-                    Ver Request
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-yellow-500">
-                    Ver Response
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500">
-                    Reenviar
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-indigo-500">
-                    Consultar en DGII
-                  </li>
-                </div>
-                <div className="mt-3 text-center">
-                  <button
-                    onClick={handleToggleModal}
-                    className="text-blue-500 hover:text-blue-700 text-sm"
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Componente de Paginación */}
           <Pagination

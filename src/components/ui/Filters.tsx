@@ -5,8 +5,9 @@ interface FiltersProps {
   setSearchTerm: (value: string) => void;
   rncReceptor: string;
   setRncReceptor: (value: string) => void;
-  tipoEcf: string;
-  setTipoEcf: (value: string) => void;
+  tipoDocumento: string;
+  setTipoDocumento: (value: string) => void;
+  tipoDocumentoOptions: string[];
   fetchComprobantes: () => void;
 }
 
@@ -15,8 +16,9 @@ const Filters: React.FC<FiltersProps> = ({
   setSearchTerm,
   rncReceptor,
   setRncReceptor,
-  tipoEcf,
-  setTipoEcf,
+  tipoDocumento,
+  setTipoDocumento,
+  tipoDocumentoOptions,
   fetchComprobantes,
 }) => {
   return (
@@ -41,15 +43,15 @@ const Filters: React.FC<FiltersProps> = ({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Tipo ECF</label>
+          <label className="block text-sm font-medium text-gray-700">Tipo Documento</label>
           <select
-            value={tipoEcf}
-            onChange={(e) => setTipoEcf(e.target.value)}
+            value={tipoDocumento}
+            onChange={(e) => setTipoDocumento(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
           >
-            <option>Todos</option>
-            <option>Comprobante Electrónico de Compras</option>
-            <option>Comprobante Electrónico para Gastos Menores</option>
+            {tipoDocumentoOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
           </select>
         </div>
         <div className="flex items-end">
