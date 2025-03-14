@@ -65,6 +65,8 @@ const EmisionComprobantes: React.FC = () => {
   const [tipoDocumento, setTipoDocumento] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [estado, setEstado] = useState("Todos");
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -100,11 +102,16 @@ const EmisionComprobantes: React.FC = () => {
   };
 
   const filteredComprobantes = comprobantes.filter((item) => {
+    const fechaEmision = new Date(item.fecha_emision);
+    const desde = fechaDesde ? new Date(fechaDesde) : null;
+    const hasta = fechaHasta ? new Date(fechaHasta) : null;
     return (
       (!searchTerm || item.numero_documento.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (!rncReceptor || item.receptor_rnc.includes(rncReceptor)) &&
       (tipoDocumento === "Todos" || item.tipo_documento === tipoDocumento) &&
-      (estado === "Todos" || item.dgii_estado.toLowerCase() === estado.toLowerCase())
+      (estado === "Todos" || item.dgii_estado.toLowerCase() === estado.toLowerCase()) &&
+      (!desde || fechaEmision >= desde) &&
+      (!hasta || fechaEmision <= hasta)
     );
   });
 
@@ -131,6 +138,10 @@ const EmisionComprobantes: React.FC = () => {
         tipoDocumentoOptions={tipoDocumentoOptions}
         estado={estado}
         setEstado={setEstado}
+        fechaDesde={fechaDesde}
+        setFechaDesde={setFechaDesde}
+        fechaHasta={fechaHasta}
+        setFechaHasta={setFechaHasta}
         fetchComprobantes={fetchComprobantes}
       />
 

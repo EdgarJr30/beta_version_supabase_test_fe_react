@@ -10,6 +10,10 @@ interface FiltersProps {
   tipoDocumentoOptions: string[];
   estado: string;
   setEstado: (value: string) => void;
+  fechaDesde: string;
+  setFechaDesde: (value: string) => void;
+  fechaHasta: string;
+  setFechaHasta: (value: string) => void;
   fetchComprobantes: () => void;
 }
 
@@ -23,6 +27,10 @@ const Filters: React.FC<FiltersProps> = ({
   tipoDocumentoOptions,
   estado,
   setEstado,
+  fechaDesde,
+  setFechaDesde,
+  fechaHasta,
+  setFechaHasta,
   fetchComprobantes,
 }) => {
   return (
@@ -69,6 +77,24 @@ const Filters: React.FC<FiltersProps> = ({
             <option value="Autorizado">AUTORIZADO</option>
             <option value="No Autorizado">NO AUTORIZADO</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Emisión desde</label>
+          <input
+            type="date"
+            value={fechaDesde}
+            onChange={(e) => setFechaDesde(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Emisión hasta</label>
+          <input
+            type="date"
+            value={fechaHasta}
+            onChange={(e) => setFechaHasta(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+          />
         </div>
         <div className="flex items-end">
           <button
