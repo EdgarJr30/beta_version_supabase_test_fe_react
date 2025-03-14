@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AppVersion from '../../components/AppVersion';
-// import TurnstileCaptcha from '../../components/TurnstileCaptcha';
+import TurnstileCaptcha from '../../components/TurnstileCaptcha';
 
 export default function Login() {
     const { session } = useAuth();
@@ -11,9 +11,8 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
-    // Redirigir si ya está autenticado
     useEffect(() => {
         if (session) {
             navigate('/');
@@ -25,10 +24,10 @@ export default function Login() {
         setError('');
 
         // Validar que el usuario haya completado el captcha
-        // if (!captchaToken) {
-        //     setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
-        //     return;
-        // }
+        if (!captchaToken) {
+            setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
+            return;
+        }
 
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -36,7 +35,7 @@ export default function Login() {
             setError(error.message);
         }
         else {
-            // console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
+            console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
         }
     };
 
@@ -102,9 +101,9 @@ export default function Login() {
                     </div>
 
                     {/* Captcha */}
-                    {/* <div>
+                    <div>
                         <TurnstileCaptcha onSuccess={setCaptchaToken} />
-                    </div> */}
+                    </div>
 
                     <div>
                         <button
@@ -126,9 +125,5 @@ export default function Login() {
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
             </div>
         </div>
-
-
-
-
     );
 }
