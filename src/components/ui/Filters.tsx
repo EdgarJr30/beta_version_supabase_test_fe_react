@@ -8,6 +8,8 @@ interface FiltersProps {
   tipoDocumento: string;
   setTipoDocumento: (value: string) => void;
   tipoDocumentoOptions: string[];
+  estado: string;
+  setEstado: (value: string) => void;
   fetchComprobantes: () => void;
 }
 
@@ -19,6 +21,8 @@ const Filters: React.FC<FiltersProps> = ({
   tipoDocumento,
   setTipoDocumento,
   tipoDocumentoOptions,
+  estado,
+  setEstado,
   fetchComprobantes,
 }) => {
   return (
@@ -52,6 +56,18 @@ const Filters: React.FC<FiltersProps> = ({
             {tipoDocumentoOptions.map((option) => (
               <option key={option} value={option}>{option}</option>
             ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Estado Documento</label>
+          <select
+            value={estado}
+            onChange={(e) => setEstado(e.target.value)}
+            className="w-full text-sm p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+          >
+            <option value="Todos">ESTADO DOCUMENTO (TODOS)</option>
+            <option value="Autorizado">AUTORIZADO</option>
+            <option value="No Autorizado">NO AUTORIZADO</option>
           </select>
         </div>
         <div className="flex items-end">

@@ -64,6 +64,7 @@ const EmisionComprobantes: React.FC = () => {
   const [rncReceptor, setRncReceptor] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [estado, setEstado] = useState("Todos");
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -102,7 +103,8 @@ const EmisionComprobantes: React.FC = () => {
     return (
       (!searchTerm || item.numero_documento.includes(searchTerm)) &&
       (!rncReceptor || item.receptor_rnc.includes(rncReceptor)) &&
-      (tipoDocumento === "Todos" || item.tipo_documento === tipoDocumento)
+      (tipoDocumento === "Todos" || item.tipo_documento === tipoDocumento) &&
+      (estado === "Todos" || item.dgii_estado.toLowerCase() === estado.toLowerCase())
     );
   });
 
@@ -127,6 +129,8 @@ const EmisionComprobantes: React.FC = () => {
         tipoDocumento={tipoDocumento}
         setTipoDocumento={setTipoDocumento}
         tipoDocumentoOptions={tipoDocumentoOptions}
+        estado={estado}
+        setEstado={setEstado}
         fetchComprobantes={fetchComprobantes}
       />
 
