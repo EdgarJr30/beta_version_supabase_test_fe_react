@@ -64,6 +64,7 @@ const EmisionComprobantes: React.FC = () => {
   const [rncReceptor, setRncReceptor] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [estado, setEstado] = useState("Todos");
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
@@ -101,6 +102,7 @@ const EmisionComprobantes: React.FC = () => {
     setLoading(false);
   };
 
+  {/* Filtros */ }
   const filteredComprobantes = comprobantes.filter((item) => {
     const fechaEmision = new Date(item.fecha_emision);
     const desde = fechaDesde ? new Date(fechaDesde) : null;
@@ -121,9 +123,14 @@ const EmisionComprobantes: React.FC = () => {
       itemsPerPage,
     });
 
-  const handleToggleModal = () => {
+  const handleToggleModal = (event?: React.MouseEvent<HTMLButtonElement>) => {
+    if (event) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setModalPosition({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
+    }
     setIsModalOpen(!isModalOpen);
   };
+
 
   return (
     <div className="">
@@ -146,15 +153,18 @@ const EmisionComprobantes: React.FC = () => {
       />
 
       {/* Modal */}
+
       {isModalOpen && (
         <div
-          className="absolute left-8 top-1 z-10 bg-white border rounded-lg shadow-lg w-48"
-          onClick={handleToggleModal}
+          className="absolute z-10 bg-white border rounded-lg shadow-lg w-48"
+          style={{
+            top: `${modalPosition.top}px`,
+            left: `${modalPosition.left}px`,
+            position: "absolute"
+          }}
+          onClick={() => setIsModalOpen(false)} // Ahora cierra sin error
         >
-          <div
-            className="bg-white rounded-lg shadow-lg w-64 p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bg-white rounded-lg shadow-lg w-64 p-4" onClick={(e) => e.stopPropagation()}>
             <div className="space-y-3">
               <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">
                 Descargar PDF
@@ -176,10 +186,7 @@ const EmisionComprobantes: React.FC = () => {
               </li>
             </div>
             <div className="mt-3 text-center">
-              <button
-                onClick={handleToggleModal}
-                className="text-blue-500 hover:text-blue-700 text-sm"
-              >
+              <button onClick={() => handleToggleModal()} className="text-blue-500 hover:text-blue-700 text-sm">
                 Cerrar
               </button>
             </div>
@@ -187,7 +194,7 @@ const EmisionComprobantes: React.FC = () => {
         </div>
       )}
 
-      {/* Mostrar Cargando */}
+      {/* Loader */}
       {loading ? (
         <div className="text-center text-gray-500">Cargando comprobantes...</div>
       ) : (
@@ -238,7 +245,7 @@ const EmisionComprobantes: React.FC = () => {
                 {paginatedComprobantes.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-100 border-b">
                     <td className="p-3 text-center">
-                      <button onClick={() => handleToggleModal()} className="text-xl">...</button>
+                      <button onClick={(event) => handleToggleModal(event)} className="text-xl">...</button>
                     </td>
                     <td className="p-2 border">{item.emisor_rnc}</td>
                     <td className="p-2 border truncate">{item.emisor_razon_social}</td>
