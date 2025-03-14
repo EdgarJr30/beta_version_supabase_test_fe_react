@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
 import Pagination from '../../components/ui/Pagination';
 import Filters from "../../components/ui/Filters";
+import ModalOpciones from "../../components/ModalOpciones";
 interface EmisionComprobante {
   id: number;
   emisor_rnc: string;
@@ -26,7 +27,7 @@ interface EmisionComprobante {
   fecha_autorizacion: string;
   fecha_firma: string;
   codigo_seguridad: string;
-  url_consulta_qr: boolean;
+  url_consulta_qr: string;
   document_xml: string;
   acuse_recibo_estado: number;
   acuse_recibo_json: number;
@@ -64,13 +65,12 @@ const EmisionComprobantes: React.FC = () => {
   const [rncReceptor, setRncReceptor] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("Todos");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFactura, setSelectedFactura] = useState<EmisionComprobante | null>(null);
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [estado, setEstado] = useState("Todos");
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const itemsPerPage = 10;
-
-  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (roles === "admin" || roles === "user") {
@@ -79,31 +79,6 @@ const EmisionComprobantes: React.FC = () => {
       setLoading(false);
     }
   }, [roles]);
-
-  // Cerrar el modal al hacer clic fuera de él
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        setIsModalOpen(false);
-      }
-    };
-
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsModalOpen(false);
-      }
-    };
-
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscKey);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, [isModalOpen]);
 
   const fetchComprobantes = async () => {
     setLoading(true);
@@ -150,16 +125,13 @@ const EmisionComprobantes: React.FC = () => {
       itemsPerPage,
     });
 
-  const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>, factura: EmisionComprobante) => {
     event.stopPropagation();
-
     const rect = event.currentTarget.getBoundingClientRect();
 
+    setSelectedFactura(factura);
+    setModalPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
     setIsModalOpen(true);
-    setModalPosition({
-      top: rect.bottom + window.scrollY + 5,
-      left: rect.left + window.scrollX
-    });
   };
 
 
@@ -185,32 +157,13 @@ const EmisionComprobantes: React.FC = () => {
 
       {/* Modal */}
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div
-          className="absolute bg-white border rounded-lg shadow-lg w-64 z-50"
-          style={{
-            top: `${modalPosition.top}px`,
-            left: `${modalPosition.left}px`
-          }}
-        >
-          <div ref={modalRef} className="bg-white rounded-lg shadow-lg p-4">
-            <div className="space-y-3">
-              <li className="px-2 hover:bg-gray-100 cursor-pointer text-blue-500">Descargar PDF</li>
-              <li className="px-2 hover:bg-gray-100 cursor-pointer text-green-500">Descargar XML</li>
-              <li className="px-2 hover:bg-gray-100 cursor-pointer text-orange-500">Ver Request</li>
-              <li className="px-2 hover:bg-gray-100 cursor-pointer text-yellow-500">Ver Response</li>
-              <li className="px-2 hover:bg-gray-100 cursor-pointer text-red-500">Reenviar</li>
-              <li className="px-2 hover:bg-gray-100 cursor-pointer text-indigo-500">Consultar en DGII</li>
-            </div>
-            <div className="mt-3 text-center">
-              {/* <button onClick={() => setIsModalOpen(false)} className="text-blue-500 hover:text-blue-700 text-sm">
-                Cerrar
-              </button> */}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal de opciones */}
+      <ModalOpciones
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        urlConsultaQR={selectedFactura?.url_consulta_qr ?? null}
+        position={modalPosition}
+      />
 
       {/* Loader */}
       {loading ? (
@@ -263,7 +216,7 @@ const EmisionComprobantes: React.FC = () => {
                 {paginatedComprobantes.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-100 border-b">
                     <td className="p-3 text-center">
-                      <button onClick={(event) => handleToggleModal(event)} className="text-xl">...</button>
+                      <button onClick={(event) => handleToggleModal(event, item)} className="text-xl">...</button>
                     </td>
                     <td className="p-2 border">{item.emisor_rnc}</td>
                     <td className="p-2 border truncate">{item.emisor_razon_social}</td>
