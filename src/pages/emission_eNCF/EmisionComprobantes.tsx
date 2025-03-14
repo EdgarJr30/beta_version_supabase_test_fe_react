@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
@@ -70,6 +70,8 @@ const EmisionComprobantes: React.FC = () => {
   const [fechaHasta, setFechaHasta] = useState("");
   const itemsPerPage = 10;
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (roles === "admin" || roles === "user") {
       fetchComprobantes();
@@ -77,6 +79,31 @@ const EmisionComprobantes: React.FC = () => {
       setLoading(false);
     }
   }, [roles]);
+
+  // Cerrar el modal al hacer clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setIsModalOpen(false);
+      }
+    };
+
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscKey);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [isModalOpen]);
 
   const fetchComprobantes = async () => {
     setLoading(true);
@@ -123,12 +150,16 @@ const EmisionComprobantes: React.FC = () => {
       itemsPerPage,
     });
 
-  const handleToggleModal = (event?: React.MouseEvent<HTMLButtonElement>) => {
-    if (event) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      setModalPosition({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
-    }
-    setIsModalOpen(!isModalOpen);
+  const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    setIsModalOpen(true);
+    setModalPosition({
+      top: rect.bottom + window.scrollY + 5,
+      left: rect.left + window.scrollX
+    });
   };
 
 
@@ -154,39 +185,26 @@ const EmisionComprobantes: React.FC = () => {
 
       {/* Modal */}
 
+      {/* Modal */}
       {isModalOpen && (
         <div
-          className="absolute z-10 bg-white border rounded-lg shadow-lg w-48"
+          className="absolute bg-white border rounded-lg shadow-lg w-64 z-50"
           style={{
             top: `${modalPosition.top}px`,
-            left: `${modalPosition.left}px`,
-            position: "absolute"
+            left: `${modalPosition.left}px`
           }}
-          onClick={() => setIsModalOpen(false)} // Ahora cierra sin error
         >
-          <div className="bg-white rounded-lg shadow-lg w-64 p-4" onClick={(e) => e.stopPropagation()}>
+          <div ref={modalRef} className="bg-white rounded-lg shadow-lg p-4">
             <div className="space-y-3">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">
-                Descargar PDF
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-green-500">
-                Descargar XML
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-orange-500">
-                Ver Request
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-yellow-500">
-                Ver Response
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500">
-                Reenviar
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-indigo-500">
-                Consultar en DGII
-              </li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">Descargar PDF</li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-green-500">Descargar XML</li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-orange-500">Ver Request</li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-yellow-500">Ver Response</li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500">Reenviar</li>
+              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-indigo-500">Consultar en DGII</li>
             </div>
             <div className="mt-3 text-center">
-              <button onClick={() => handleToggleModal()} className="text-blue-500 hover:text-blue-700 text-sm">
+              <button onClick={() => setIsModalOpen(false)} className="text-blue-500 hover:text-blue-700 text-sm">
                 Cerrar
               </button>
             </div>
