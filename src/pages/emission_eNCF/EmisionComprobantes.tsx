@@ -196,17 +196,17 @@ const EmisionComprobantes: React.FC = () => {
         >
           <div ref={modalRef} className="bg-white rounded-lg shadow-lg p-4">
             <div className="space-y-3">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-blue-500">Descargar PDF</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-green-500">Descargar XML</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-orange-500">Ver Request</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-yellow-500">Ver Response</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500">Reenviar</li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-indigo-500">Consultar en DGII</li>
+              <li className="px-2 hover:bg-gray-100 cursor-pointer text-blue-500">Descargar PDF</li>
+              <li className="px-2 hover:bg-gray-100 cursor-pointer text-green-500">Descargar XML</li>
+              <li className="px-2 hover:bg-gray-100 cursor-pointer text-orange-500">Ver Request</li>
+              <li className="px-2 hover:bg-gray-100 cursor-pointer text-yellow-500">Ver Response</li>
+              <li className="px-2 hover:bg-gray-100 cursor-pointer text-red-500">Reenviar</li>
+              <li className="px-2 hover:bg-gray-100 cursor-pointer text-indigo-500">Consultar en DGII</li>
             </div>
             <div className="mt-3 text-center">
-              <button onClick={() => setIsModalOpen(false)} className="text-blue-500 hover:text-blue-700 text-sm">
+              {/* <button onClick={() => setIsModalOpen(false)} className="text-blue-500 hover:text-blue-700 text-sm">
                 Cerrar
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
