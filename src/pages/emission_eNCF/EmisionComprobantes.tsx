@@ -101,7 +101,7 @@ const EmisionComprobantes: React.FC = () => {
 
   const filteredComprobantes = comprobantes.filter((item) => {
     return (
-      (!searchTerm || item.numero_documento.includes(searchTerm)) &&
+      (!searchTerm || item.numero_documento.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (!rncReceptor || item.receptor_rnc.includes(rncReceptor)) &&
       (tipoDocumento === "Todos" || item.tipo_documento === tipoDocumento) &&
       (estado === "Todos" || item.dgii_estado.toLowerCase() === estado.toLowerCase())
