@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AppVersion from '../../components/AppVersion';
-import TurnstileCaptcha from '../../components/TurnstileCaptcha';
+// import TurnstileCaptcha from '../../components/TurnstileCaptcha';
 
 export default function Login() {
     const { session } = useAuth();
@@ -11,7 +11,7 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     useEffect(() => {
         if (session) {
@@ -24,19 +24,19 @@ export default function Login() {
         setError('');
 
         // Validar que el usuario haya completado el captcha
-        if (!captchaToken) {
-            setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
-            return;
-        }
+        // if (!captchaToken) {
+        //     setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
+        //     return;
+        // }
 
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
             setError(error.message);
         }
-        else {
-            console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
-        }
+        // else {
+        //     console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
+        // }
     };
 
     return (
@@ -101,9 +101,9 @@ export default function Login() {
                     </div>
 
                     {/* Captcha */}
-                    <div>
+                    {/* <div>
                         <TurnstileCaptcha onSuccess={setCaptchaToken} />
-                    </div>
+                    </div> */}
 
                     <div>
                         <button
