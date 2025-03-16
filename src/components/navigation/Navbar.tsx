@@ -134,7 +134,7 @@ const Navbar = () => {
                                             )}
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link className="block w-full h-full" to="/anulacion-secuencias">Anulación De Secuencias</Link>
+                                            <Link className="block w-full h-full" to="/AnularSecuenciaAutorizada">Anulación De Secuencias</Link>
                                         </li>
                                     </ul>
                                 )}

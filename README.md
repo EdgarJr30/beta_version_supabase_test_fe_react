@@ -76,7 +76,7 @@ npm test
 ✅ Manejo de roles y permisos  
 ✅ UI moderna con Tailwind CSS  
 ✅ Manejo de sesión con Context Provider  
-✅ Implementación modular y escalable  
+✅ Implementación modular y escalable
 
 ## 📂 Estructura del Código
 
@@ -113,6 +113,10 @@ npm test
 📌 Mantén actualizada la URL de Supabase en caso de cambios.  
 📌 Considera implementar manejo de estado global si la aplicación crece.  
 📌 Verifica regularmente las configuraciones de seguridad en Supabase.  
+
+## 🤠 Archivos Importantes
+📌 Archivo: rolePermissions.tsx maneja el acceso a las rutas para cada rol
+📌 Archivo: App.tsx se crean las rutas para cada pagina del app
 
 ## 🌐 Link de la Demo
 

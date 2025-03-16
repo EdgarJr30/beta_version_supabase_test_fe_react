@@ -8,6 +8,7 @@ import Testing from "./pages/dashboard/Testing";
 import RoleRoute from "./routes/RoleRoute";
 import Tenant from "./pages/dashboard/Tenant";
 import EmisionComprobantes from "./pages/emission_eNCF/EmisionComprobantes";
+import AnularSecuenciaAutorizada from "./pages/emission_eNCF/AnularSecuenciaAutorizada";
 import MainLayout from "./components/layouts/MainLayout";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/user" element={<PrivateRoute><RoleRoute><User /></RoleRoute></PrivateRoute>} />
           <Route path="/testing" element={<PrivateRoute><RoleRoute><Testing /></RoleRoute></PrivateRoute>} />
           <Route path="/emision-eNCF" element={<PrivateRoute><RoleRoute><EmisionComprobantes /></RoleRoute></PrivateRoute>} />
+          <Route path="/AnularSecuenciaAutorizada" element={<PrivateRoute><RoleRoute><AnularSecuenciaAutorizada /></RoleRoute></PrivateRoute>} />
 
           {/* Ruta para manejar páginas no encontradas */}
           <Route path="*" element={<NotFound />} />
