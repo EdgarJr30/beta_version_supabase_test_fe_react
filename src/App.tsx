@@ -10,7 +10,7 @@ import Tenant from "./pages/dashboard/Tenant";
 import EmisionComprobantes from "./pages/emission_eNCF/EmisionComprobantes";
 import AnularSecuenciaAutorizada from "./pages/emission_eNCF/AnularSecuenciaAutorizada";
 import MainLayout from "./components/layouts/MainLayout";
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/dashboard/NotFound";
 
 export default function App() {
   return (
