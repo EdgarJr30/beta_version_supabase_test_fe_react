@@ -90,13 +90,13 @@ const Navbar = () => {
                                 {openDropdown === "admin" && (
                                     <ul className="absolute left-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md overflow-hidden border border-gray-300 z-50">
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link to="/admin">Configuración</Link>
+                                            <Link className="block w-full h-full" to="/admin">Configuración</Link>
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link to="/user">Usuarios</Link>
+                                            <Link className="block w-full h-full" to="/user">Usuarios</Link>
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link to="/tenant">Actualización Datos Empresa</Link>
+                                            <Link className="block w-full h-full" to="/tenant">Actualización Datos Empresa</Link>
                                         </li>
                                     </ul>
                                 )}
@@ -127,14 +127,14 @@ const Navbar = () => {
                                             {openSubmenu === "reportes" && (
                                                 <ul className="absolute left-full top-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md border border-gray-300 z-50">
                                                     <li className="hover:bg-gray-200 px-4 py-2 flex justify-between" onClick={handleNavClick}>
-                                                        <Link to="/emision-eNCF">Consulta General</Link>
+                                                        <Link className="block w-full h-full" to="/emision-eNCF">Consulta General</Link>
                                                         <span className="text-red-600 text-sm font-semibold">(Nuevo)</span>
                                                     </li>
                                                 </ul>
                                             )}
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link to="/anulacion-secuencias">Anulación De Secuencias</Link>
+                                            <Link className="block w-full h-full" to="/anulacion-secuencias">Anulación De Secuencias</Link>
                                         </li>
                                     </ul>
                                 )}
@@ -155,10 +155,10 @@ const Navbar = () => {
                                 {openDropdown === "recepcion" && (
                                     <ul className="absolute left-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md overflow-hidden border border-gray-300 z-50">
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link to="/reportes-documentos-recepcion">Reportes De Documentos</Link>
+                                            <Link className="block w-full h-full" to="/reportes-documentos-recepcion">Reportes De Documentos</Link>
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link to="/reportes-aprobacion">Reportes De Aprobación Comercial</Link>
+                                            <Link className="block w-full h-full" to="/reportes-aprobacion">Reportes De Aprobación Comercial</Link>
                                         </li>
                                     </ul>
                                 )}
