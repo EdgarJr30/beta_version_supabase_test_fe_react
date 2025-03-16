@@ -28,8 +28,6 @@ export default function Home() {
 
   return (
     <>
-
-
       <div className="bg-white p-6 md:p-8 lg:p-10 space-y-6">
         {/* Contenedor principal*/}
         <div className="bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-md mx-auto w-full max-w-5xl">
@@ -44,7 +42,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <span className="font-semibold whitespace-nowrap">Vigencia Certificado Digital Hasta:</span>
               <span>12 de marzo de 2025</span>
-              <a href="#" className="text-blue-500">Actualizar</a>
+              <a href="/AdmCertificadoDigital" className="text-blue-500">Actualizar</a>
             </div>
 
             {/* Correo Electrónico */}

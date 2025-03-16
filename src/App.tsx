@@ -12,6 +12,7 @@ import AnularSecuenciaAutorizada from "./pages/emission_eNCF/AnularSecuenciaAuto
 import AprobacionComprobantes from "./pages/aprobacion_eNCF/AprobacionComprobantes";
 import MainLayout from "./components/layouts/MainLayout";
 import NotFound from "./pages/dashboard/NotFound";
+import UpdateDigitalCertificate from "./pages/Certificate/UpdateCertificate";
 
 export default function App() {
   return (
@@ -29,6 +30,9 @@ export default function App() {
           <Route path="/tenant" element={<PrivateRoute><RoleRoute><Tenant /></RoleRoute></PrivateRoute>} />
           <Route path="/user" element={<PrivateRoute><RoleRoute><User /></RoleRoute></PrivateRoute>} />
           <Route path="/testing" element={<PrivateRoute><RoleRoute><Testing /></RoleRoute></PrivateRoute>} />
+          
+          {/* CERTIFICADO PAGE */}
+          <Route path="/AdmCertificadoDigital" element={<PrivateRoute><RoleRoute><UpdateDigitalCertificate /></RoleRoute></PrivateRoute>} />
 
           {/* EMISION COMPROBANTES */}
           <Route path="/emision-eNCF" element={<PrivateRoute><RoleRoute><EmisionComprobantes /></RoleRoute></PrivateRoute>} />
