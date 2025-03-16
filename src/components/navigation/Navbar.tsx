@@ -155,7 +155,7 @@ const Navbar = () => {
                                 {openDropdown === "recepcion" && (
                                     <ul className="absolute left-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md overflow-hidden border border-gray-300 z-50">
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                                            <Link className="block w-full h-full" to="/reportes-documentos-recepcion">Reportes De Documentos</Link>
+                                            <Link className="block w-full h-full" to="/aprobacion-eNCF">Consulta General</Link>
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
                                             <Link className="block w-full h-full" to="/reportes-aprobacion">Reportes De Aprobación Comercial</Link>

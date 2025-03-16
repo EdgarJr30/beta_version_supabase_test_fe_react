@@ -9,6 +9,7 @@ import RoleRoute from "./routes/RoleRoute";
 import Tenant from "./pages/dashboard/Tenant";
 import EmisionComprobantes from "./pages/emission_eNCF/EmisionComprobantes";
 import AnularSecuenciaAutorizada from "./pages/emission_eNCF/AnularSecuenciaAutorizada";
+import AprobacionComprobantes from "./pages/aprobacion_eNCF/AprobacionComprobantes";
 import MainLayout from "./components/layouts/MainLayout";
 import NotFound from "./pages/dashboard/NotFound";
 
@@ -23,12 +24,18 @@ export default function App() {
           <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
 
           {/* Rutas protegidas con RoleRoute */}
+          {/* DASHBOARD PAGES */}
           <Route path="/admin" element={<PrivateRoute><RoleRoute><Admin /></RoleRoute></PrivateRoute>} />
           <Route path="/tenant" element={<PrivateRoute><RoleRoute><Tenant /></RoleRoute></PrivateRoute>} />
           <Route path="/user" element={<PrivateRoute><RoleRoute><User /></RoleRoute></PrivateRoute>} />
           <Route path="/testing" element={<PrivateRoute><RoleRoute><Testing /></RoleRoute></PrivateRoute>} />
+
+          {/* EMISION COMPROBANTES */}
           <Route path="/emision-eNCF" element={<PrivateRoute><RoleRoute><EmisionComprobantes /></RoleRoute></PrivateRoute>} />
           <Route path="/AnularSecuenciaAutorizada" element={<PrivateRoute><RoleRoute><AnularSecuenciaAutorizada /></RoleRoute></PrivateRoute>} />
+
+          {/* APROBACION COMPROBANTES */}
+          <Route path="/aprobacion-eNCF" element={<PrivateRoute><RoleRoute><AprobacionComprobantes /></RoleRoute></PrivateRoute>} />
 
           {/* Ruta para manejar páginas no encontradas */}
           <Route path="*" element={<NotFound />} />
