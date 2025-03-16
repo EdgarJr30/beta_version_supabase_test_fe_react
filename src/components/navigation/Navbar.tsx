@@ -8,7 +8,7 @@ const Navbar = () => {
     const { signOut, roles } = useAuth();
     const [companyName, setCompanyName] = useState<string | null>(null);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-    const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+    // const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -30,18 +30,18 @@ const Navbar = () => {
 
     const handleMouseEnter = (menu: string) => {
         setOpenDropdown(menu);
-        setOpenSubmenu(null);
+        // setOpenSubmenu(null);
     };
 
     const handleMouseLeaveNavbar = () => {
         setOpenDropdown(null);
-        setOpenSubmenu(null);
+        // setOpenSubmenu(null);
     };
 
     const handleNavClick = () => {
         setIsMobileMenuOpen(false);
         setOpenDropdown(null);
-        setOpenSubmenu(null);
+        // setOpenSubmenu(null);
     };
 
     return (
@@ -118,8 +118,8 @@ const Navbar = () => {
                                     <ul className="absolute left-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md border border-gray-300 z-50">
                                         <li
                                             className="relative group"
-                                            onMouseEnter={() => setOpenSubmenu("reportes")}
-                                            onMouseLeave={() => setOpenSubmenu(null)}
+                                            // onMouseEnter={() => setOpenSubmenu("reportes")}
+                                            // onMouseLeave={() => setOpenSubmenu(null)}
                                         >
                                             {/* Para poder abrir sub menus, aqui esta la logica */}
                                             {/* <span className="block px-4 py-2 cursor-pointer hover:bg-gray-200">
