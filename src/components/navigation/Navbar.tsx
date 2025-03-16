@@ -121,17 +121,22 @@ const Navbar = () => {
                                             onMouseEnter={() => setOpenSubmenu("reportes")}
                                             onMouseLeave={() => setOpenSubmenu(null)}
                                         >
-                                            <span className="block px-4 py-2 cursor-pointer hover:bg-gray-200">
+                                            {/* Para poder abrir sub menus, aqui esta la logica */}
+                                            {/* <span className="block px-4 py-2 cursor-pointer hover:bg-gray-200">
                                                 Reportes De Documentos
-                                            </span>
-                                            {openSubmenu === "reportes" && (
+                                            </span> */}
+                                            {/* {openSubmenu === "reportes" && (
                                                 <ul className="absolute left-full top-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md border border-gray-300 z-50">
                                                     <li className="hover:bg-gray-200 px-4 py-2 flex justify-between" onClick={handleNavClick}>
                                                         <Link className="block w-full h-full" to="/emision-eNCF">Consulta General</Link>
                                                         <span className="text-red-600 text-sm font-semibold">(Nuevo)</span>
                                                     </li>
                                                 </ul>
-                                            )}
+                                            )} */}
+
+                                        </li>
+                                        <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
+                                            <Link className="block w-full h-full" to="/emision-eNCF">Consulta General</Link>
                                         </li>
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
                                             <Link className="block w-full h-full" to="/AnularSecuenciaAutorizada">Anulación De Secuencias</Link>
