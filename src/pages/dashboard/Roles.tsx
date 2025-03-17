@@ -84,10 +84,10 @@ const Roles: React.FC = () => {
                         <table className="min-w-full text-xs border-collapse">
                             <thead className="bg-gray-200 text-gray-700">
                                 <tr>
-                                    <th className="p-2 border min-w-[50px]">ID</th>
-                                    <th className="p-2 border min-w-[250px]">Nombre</th>
-                                    <th className="p-2 border min-w-[250px]">Descripcion</th>
-                                    <th className="p-2 border min-w-[150px]">Fecha de creacion</th>
+                                    <th className="p-2 border border-gray-700 min-w-[50px]">ID</th>
+                                    <th className="p-2 border border-gray-700 min-w-[250px]">Nombre</th>
+                                    <th className="p-2 border border-gray-700 min-w-[250px]">Descripcion</th>
+                                    <th className="p-2 border border-gray-700 min-w-[150px]">Fecha de creacion</th>
                                 </tr>
                             </thead>
                             <tbody>
