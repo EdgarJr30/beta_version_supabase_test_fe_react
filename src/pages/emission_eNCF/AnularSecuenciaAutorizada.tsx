@@ -3,23 +3,27 @@ import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
 import Pagination from "../../components/ui/Pagination";
+import { tipoDocumentoOptions } from '../../utils/documentTypes'
 
-// Tip: Adjust this interface to match your “anulación” data fields
 interface Anulacion {
     id: number;
+    emisor_rnc: string;
+    emisor_razon_social: string;
+    cantidad_ncf_anulados: number;
+    estado_emision: string;
+    fecha_hora_anulaciones_ncf: string;
+    detalle_anulacion: string;
     tipo_documento: string;
+    document_xml: string;
     secuencial_desde: string;
     secuencial_hasta: string;
-    // Add other fields as necessary
+    dgii_mensaje_respuesta: string;
+    created_at: string;
 }
 
-const tipoDocumentoOptions = [
-    "Factura de Crédito Fiscal Electrónica",
-    "Factura de Consumo Electrónica",
-    "Nota de Crédito Electrónica",
-    "Nota de Débito Electrónica",
-    // etc.
-];
+const tipoDocumentoOptionsFiltrado = tipoDocumentoOptions.filter(
+    (option) => option !== "Todos"
+);
 
 const AnularSecuenciaAutorizada: React.FC = () => {
     const { roles } = useAuth();
@@ -27,7 +31,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     // For filters/search
-    const [tipoDocumento, setTipoDocumento] = useState("Factura de Crédito Fiscal Electrónica");
+    const [tipoDocumento, setTipoDocumento] = useState("");
     const [secuencialDesde, setSecuencialDesde] = useState("");
     const [secuencialHasta, setSecuencialHasta] = useState("");
 
@@ -54,12 +58,11 @@ const AnularSecuenciaAutorizada: React.FC = () => {
         }
     }, [roles]);
 
-    // Example: fetch from Supabase or your API
     const fetchAnulaciones = async () => {
         setLoading(true);
         try {
             const { data, error } = await supabase
-                .from("anulaciones") // Example table name
+                .from("anulaciones")
                 .select("*");
             if (error) {
                 console.error("❌ Error fetching anulaciones:", error.message);
@@ -77,24 +80,21 @@ const AnularSecuenciaAutorizada: React.FC = () => {
         const matchesTipo =
             !tipoDocumento || item.tipo_documento === tipoDocumento;
 
-        // Here you could also compare secuencial_desde / secuencial_hasta, etc.
+        // Aqui puedo comparar secuencial desde y hasta
         return matchesTipo;
     });
 
-    // Handlers for the "Nueva anulación" modal
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
 
-    // Example: confirm or submit the anulación
     const handleEmitir = () => {
-        // ... your submit logic here ...
+        //TODO ... Logica para el submit ...
         console.log("Emitir anulación con:", { tipoDocumento, secuencialDesde, secuencialHasta });
         handleCloseModal();
     };
 
     return (
         <div className="p-4">
-            {/* "Nueva anulación" button */}
             <div className="flex justify-end mb-4">
                 <button
                     onClick={handleOpenModal}
@@ -104,7 +104,6 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                 </button>
             </div>
 
-            {/* Table or "loading" */}
             {loading ? (
                 <div className="text-center text-gray-500">Cargando anulaciones...</div>
             ) : (
@@ -113,19 +112,27 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                         <table className="min-w-full text-xs border-collapse">
                             <thead className="bg-gray-200 text-gray-700">
                                 <tr>
-                                    <th className="p-2 border min-w-[150px]">ID</th>
+                                    <th className="p-2 border min-w-[250px]">RNC Emisor</th>
+                                    <th className="p-2 border min-w-[250px]">Razón Social Emisor</th>
                                     <th className="p-2 border min-w-[250px]">Tipo Documento</th>
                                     <th className="p-2 border min-w-[150px]">Secuencial Desde</th>
                                     <th className="p-2 border min-w-[150px]">Secuencial Hasta</th>
+                                    <th className="p-2 border min-w-[150px]">Estado Emisión</th>
+                                    <th className="p-2 border min-w-[150px]">Fecha Emisión</th>
+                                    <th className="p-2 border min-w-[150px]">Mensaje Respuesta DGII</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {paginatedAnulaciones.map((item) => (
                                     <tr key={item.id} className="border-b hover:bg-gray-100">
-                                        <td className="p-2 border">{item.id}</td>
+                                        <td className="p-2 border">{item.emisor_rnc}</td>
+                                        <td className="p-2 border">{item.emisor_razon_social}</td>
                                         <td className="p-2 border">{item.tipo_documento}</td>
                                         <td className="p-2 border">{item.secuencial_desde}</td>
                                         <td className="p-2 border">{item.secuencial_hasta}</td>
+                                        <td className="p-2 border">{item.estado_emision}</td>
+                                        <td className="p-2 border">{item.fecha_hora_anulaciones_ncf}</td>
+                                        <td className="p-2 border">{item.dgii_mensaje_respuesta}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -142,7 +149,6 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                 </>
             )}
 
-            {/* MODAL for "Nueva anulación" */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
@@ -153,7 +159,6 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                             </button>
                         </div>
 
-                        {/* Form fields: Tipo de documento, Secuencial desde/hasta */}
                         <div className="space-y-4">
                             <div>
                                 <label className="block font-semibold mb-1">
@@ -164,7 +169,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                                     onChange={(e) => setTipoDocumento(e.target.value)}
                                     className="border p-2 rounded w-full"
                                 >
-                                    {tipoDocumentoOptions.map((option) => (
+                                    {tipoDocumentoOptionsFiltrado.map((option) => (
                                         <option key={option} value={option}>
                                             {option}
                                         </option>
@@ -197,14 +202,10 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Example "Agregar" button + table (as in your screenshot) */}
                             <div className="flex items-center space-x-2">
                                 <button className="bg-blue-500 text-white px-3 py-1 rounded">
                                     Agregar
                                 </button>
-                                <span className="text-sm text-gray-500">
-                                    (Aquí podrías manejar la lógica de agregar filas)
-                                </span>
                             </div>
 
                             <div className="overflow-x-auto border rounded">
@@ -217,7 +218,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {/* If no data, show this row: */}
+                                        {/* Si no hay data, se muestra esto: */}
                                         <tr>
                                             <td
                                                 colSpan={3}
