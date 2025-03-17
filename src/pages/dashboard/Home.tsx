@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="bg-white p-6 md:p-8 lg:p-10 space-y-6">
+      <div className="p-6 md:p-8 lg:p-10 space-y-6">
         {/* Contenedor principal*/}
         <div className="bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-md mx-auto w-full max-w-5xl">
           {/* Encabezado */}

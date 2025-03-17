@@ -47,10 +47,8 @@ const Navbar = () => {
     return (
         <div className="font-roboto" onMouseLeave={handleMouseLeaveNavbar}>
             {/* Logo y botón de menú en móviles */}
-            <div className="bg-white p-2 flex justify-between sm:justify-center items-center border-b border-gray-300">
+            <div className="p-2 flex justify-between sm:justify-center items-center border-b border-gray-300">
                 <img src="https://placehold.co/200x60?text=Company+Logo" alt="Company Logo" className="h-12" />
-
-
                 {/* Botón de menú hamburguesa en móviles */}
                 <button
                     className="sm:hidden text-blue-600 p-2"
@@ -121,8 +119,8 @@ const Navbar = () => {
                                     <ul className="absolute left-0 mt-0 w-64 bg-white text-gray-800 shadow-lg rounded-md border border-gray-300 z-50">
                                         <li
                                             className="relative group"
-                                            // onMouseEnter={() => setOpenSubmenu("reportes")}
-                                            // onMouseLeave={() => setOpenSubmenu(null)}
+                                        // onMouseEnter={() => setOpenSubmenu("reportes")}
+                                        // onMouseLeave={() => setOpenSubmenu(null)}
                                         >
                                             {/* Para poder abrir sub menus, aqui esta la logica */}
                                             {/* <span className="block px-4 py-2 cursor-pointer hover:bg-gray-200">

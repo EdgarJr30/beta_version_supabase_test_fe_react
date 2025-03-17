@@ -2,7 +2,7 @@
 const AppVersion = () => {
   return (
 
-    <span className="text-red-600 flex justify-center items-center">This is a beta version App 0.0.1</span>
+    <span className="flex justify-center text-sm/8 text-gray-300 items-center">Beta v0.1</span>
   )
 }
 
