@@ -5,6 +5,8 @@ import usePagination from "../../hooks/usePagination";
 import Pagination from '../../components/ui/Pagination';
 import Filters from "../../components/ui/Filters";
 import ModalOpciones from "../../components/ModalOpciones";
+import {tipoDocumentoOptions} from '../../utils/documentTypes'
+
 interface EmisionComprobante {
     id: number;
     emisor_rnc: string;
@@ -42,20 +44,6 @@ interface EmisionComprobante {
     created_at: number;
     rfc_xml: number;
 }
-
-const tipoDocumentoOptions = [
-    "Todos",
-    "Factura de Crédito Fiscal Electrónica",
-    "Factura de Consumo Electrónica",
-    "Nota de Crédito Electrónica",
-    "Nota de Débito Electrónica",
-    "Compras Electrónico",
-    "Gastos Menores Electrónicos",
-    "Regímenes Especiales Electrónicos",
-    "Comprobante Gubernamental Electrónico",
-    "Comprobante de Exportaciones Electrónico",
-    "Comprobante de Pagos al Exterior Electrónico"
-];
 
 const AprobacionComprobantes: React.FC = () => {
     const { roles } = useAuth();
