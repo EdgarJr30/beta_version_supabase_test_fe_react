@@ -112,14 +112,14 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                         <table className="min-w-full text-xs border-collapse">
                             <thead className="bg-gray-200 text-gray-700">
                                 <tr>
-                                    <th className="p-2 border min-w-[250px]">RNC Emisor</th>
-                                    <th className="p-2 border min-w-[250px]">Razón Social Emisor</th>
-                                    <th className="p-2 border min-w-[250px]">Tipo Documento</th>
-                                    <th className="p-2 border min-w-[150px]">Secuencial Desde</th>
-                                    <th className="p-2 border min-w-[150px]">Secuencial Hasta</th>
-                                    <th className="p-2 border min-w-[150px]">Estado Emisión</th>
-                                    <th className="p-2 border min-w-[150px]">Fecha Emisión</th>
-                                    <th className="p-2 border min-w-[150px]">Mensaje Respuesta DGII</th>
+                                    <th className="p-2 border border-gray-700 min-w-[250px]">RNC Emisor</th>
+                                    <th className="p-2 border border-gray-700 min-w-[250px]">Razón Social Emisor</th>
+                                    <th className="p-2 border border-gray-700 min-w-[250px]">Tipo Documento</th>
+                                    <th className="p-2 border border-gray-700 min-w-[150px]">Secuencial Desde</th>
+                                    <th className="p-2 border border-gray-700 min-w-[150px]">Secuencial Hasta</th>
+                                    <th className="p-2 border border-gray-700 min-w-[150px]">Estado Emisión</th>
+                                    <th className="p-2 border border-gray-700 min-w-[150px]">Fecha Emisión</th>
+                                    <th className="p-2 border border-gray-700 min-w-[150px]">Mensaje Respuesta DGII</th>
                                 </tr>
                             </thead>
                             <tbody>
