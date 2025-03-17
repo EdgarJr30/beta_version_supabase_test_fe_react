@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.48.1",
     "@types/react-helmet": "^6.1.11",
+    "date-fns": "^4.1.0",
     "flowbite-react": "^0.10.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

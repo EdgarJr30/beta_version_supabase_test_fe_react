@@ -13,6 +13,7 @@ import AprobacionComprobantes from "./pages/aprobacion_eNCF/AprobacionComprobant
 import MainLayout from "./components/layouts/MainLayout";
 import NotFound from "./pages/dashboard/NotFound";
 import UpdateDigitalCertificate from "./pages/Certificate/UpdateCertificate";
+import Roles from "./pages/dashboard/Roles";
 
 export default function App() {
   return (
@@ -33,6 +34,9 @@ export default function App() {
           
           {/* CERTIFICADO PAGE */}
           <Route path="/AdmCertificadoDigital" element={<PrivateRoute><RoleRoute><UpdateDigitalCertificate /></RoleRoute></PrivateRoute>} />
+
+           {/* ROLES PAGE */}
+           <Route path="/AdmRol" element={<PrivateRoute><RoleRoute><Roles /></RoleRoute></PrivateRoute>} />
 
           {/* EMISION COMPROBANTES */}
           <Route path="/emision-eNCF" element={<PrivateRoute><RoleRoute><EmisionComprobantes /></RoleRoute></PrivateRoute>} />
