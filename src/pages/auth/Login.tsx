@@ -38,7 +38,6 @@ export default function Login() {
             console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
         }
     };
-    console.log("Modo desarrollo:", import.meta.env.DEV);
 
     return (
         <div className="flex min-h-screen flex-1">
