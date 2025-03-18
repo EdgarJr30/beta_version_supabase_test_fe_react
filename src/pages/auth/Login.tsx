@@ -24,7 +24,7 @@ export default function Login() {
         setError('');
 
         // Validar que el usuario haya completado el captcha
-        if (!captchaToken) {
+        if (!import.meta.env.DEV && !captchaToken) {
             setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
             return;
         }
@@ -38,6 +38,7 @@ export default function Login() {
             console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
         }
     };
+    console.log("Modo desarrollo:", import.meta.env.DEV);
 
     return (
         <div className="flex min-h-screen flex-1">
@@ -103,7 +104,7 @@ export default function Login() {
                                 </div>
                                 {/* Captcha */}
                                 <div>
-                                    <TurnstileCaptcha onSuccess={setCaptchaToken} />
+                                   {!import.meta.env.DEV && <TurnstileCaptcha onSuccess={setCaptchaToken} />}
                                 </div>
                                 <div>
                                     <button
