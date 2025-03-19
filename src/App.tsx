@@ -14,7 +14,6 @@ import MainLayout from "./components/layouts/MainLayout";
 import NotFound from "./pages/dashboard/NotFound";
 import UpdateDigitalCertificate from "./pages/Certificate/UpdateCertificate";
 import Roles from "./pages/dashboard/Roles";
-import Register from "./pages/auth/SignUp";
 
 export default function App() {
   return (
@@ -30,9 +29,8 @@ export default function App() {
           {/* DASHBOARD PAGES */}
           <Route path="/admin" element={<PrivateRoute><RoleRoute><Admin /></RoleRoute></PrivateRoute>} />
           <Route path="/tenant" element={<PrivateRoute><RoleRoute><Tenant /></RoleRoute></PrivateRoute>} />
-          <Route path="/user" element={<PrivateRoute><RoleRoute><User /></RoleRoute></PrivateRoute>} />
+          <Route path="/AdmUsuarios" element={<PrivateRoute><RoleRoute><User /></RoleRoute></PrivateRoute>} />
           <Route path="/testing" element={<PrivateRoute><RoleRoute><Testing /></RoleRoute></PrivateRoute>} />
-          <Route path="/AdmUsuarioCrear" element={<PrivateRoute><RoleRoute><Register /></RoleRoute></PrivateRoute>} />
           
           {/* CERTIFICADO PAGE */}
           <Route path="/AdmCertificadoDigital" element={<PrivateRoute><RoleRoute><UpdateDigitalCertificate /></RoleRoute></PrivateRoute>} />

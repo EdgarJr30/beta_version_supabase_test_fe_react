@@ -21,35 +21,32 @@ interface User {
   created_at: string;
 }
 
-interface AuthUser {
-  id: string;         // uuid en auth.users
-  email: string;
-  // Ajusta o agrega más campos si deseas
-}
-
 const Users: React.FC = () => {
   const { roles } = useAuth(); // "admin" | "user" | etc.
   const [usersData, setUsersData] = useState<User[]>([]);
   const [rolesData, setRolesData] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal para CREAR en public.users
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createName, setCreateName] = useState("");
-  const [createRoleId, setCreateRoleId] = useState<number | null>(null);
-  const [createError, setCreateError] = useState("");
-  // Al crear desde un usuario de auth, fijamos su ID y email
-  const [selectedAuthUser, setSelectedAuthUser] = useState<AuthUser | null>(null);
+  // Paginación
+  const itemsPerPage = 10;
+  const { paginatedData, currentPage, setCurrentPage } = usePagination({
+    data: usersData,
+    itemsPerPage,
+  });
 
-  // Modal para INVITAR usuario (esto crea en auth.users)
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteError, setInviteError] = useState("");
+  // =========================
+  // ESTADOS PARA MODAL "REGISTER"
+  // =========================
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [registerName, setRegisterName] = useState("");
+  const [registerError, setRegisterError] = useState("");
+  const [registerLoading, setRegisterLoading] = useState(false);
 
-  // Listado de auth.users (para mapearlos a public.users)
-  const [authUsers, setAuthUsers] = useState<AuthUser[]>([]);
-
-  // Modal para EDITAR
+  // =========================
+  // ESTADOS PARA EDITAR
+  // =========================
   const [showEditModal, setShowEditModal] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
   const [editEmail, setEditEmail] = useState("");
@@ -57,20 +54,17 @@ const Users: React.FC = () => {
   const [editRoleId, setEditRoleId] = useState<number | null>(null);
   const [editError, setEditError] = useState("");
 
-  // Modal para ELIMINAR
+  // =========================
+  // ESTADOS PARA ELIMINAR
+  // =========================
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [deleteError, setDeleteError] = useState("");
 
-  // Paginación (para public.users)
-  const itemsPerPage = 10;
-  const { paginatedData, currentPage, setCurrentPage } = usePagination({
-    data: usersData,
-    itemsPerPage,
-  });
-
+  // =========================
+  // Cargar usuarios y roles
+  // =========================
   useEffect(() => {
-    // Si el rol es "admin" o "user", cargamos la lista de usuarios y roles
     if (roles === "admin" || roles === "user") {
       fetchAllData();
     } else {
@@ -78,7 +72,6 @@ const Users: React.FC = () => {
     }
   }, [roles]);
 
-  // Carga usuarios (public.users) y roles
   const fetchAllData = async () => {
     setLoading(true);
     try {
@@ -106,126 +99,77 @@ const Users: React.FC = () => {
     }
   };
 
-  // ======================================
-  // (1) INVITAR USUARIO (auth.users)
-  // ======================================
-  const openInviteModal = () => {
-    setInviteEmail("");
-    setInviteError("");
-    setShowInviteModal(true);
+  // =========================
+  // ABRIR/CERRAR MODAL "REGISTER"
+  // =========================
+  const openRegisterModal = () => {
+    setShowRegisterModal(true);
+    setRegisterEmail("");
+    setRegisterPassword("");
+    setRegisterName("");
+    setRegisterError("");
+    setRegisterLoading(false);
   };
 
-  const closeInviteModal = () => {
-    setShowInviteModal(false);
+  const closeRegisterModal = () => {
+    setShowRegisterModal(false);
   };
 
-  const handleInviteUser = async () => {
-    if (roles !== "admin") {
-      setInviteError("No tienes permisos para invitar usuarios.");
-      return;
-    }
-    if (!inviteEmail) {
-      setInviteError("Falta el email.");
-      return;
-    }
+  // =========================
+  // FUNCIÓN: REGISTRAR USUARIO
+  // =========================
+  const signUpUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegisterLoading(true);
+    setRegisterError("");
 
     try {
-      // Usando supabase.auth.admin.inviteUserByEmail
-      // Requiere credenciales de servicio
-      const { data, error } = await supabase.auth.admin.inviteUserByEmail(inviteEmail);
-      if (error) {
-        console.error("❌ Error al invitar usuario:", error.message);
-        setInviteError(error.message);
-      } else {
-        console.log("✅ Usuario invitado en auth.users:", data);
-        closeInviteModal();
-        // Opcional: fetchAuthUsers() para recargar la lista
+      // 1) Crear usuario en auth.users
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: registerEmail,
+        password: registerPassword,
+        options: {
+          data: { name: registerName }, // Guardar 'name' en la metadata
+        },
+      });
+
+      if (signUpError) {
+        setRegisterError(signUpError.message);
+        setRegisterLoading(false);
+        return;
       }
-    } catch (e: unknown) {
-      console.error("❌ Error general al invitar usuario:", e);
-      setInviteError(String(e));
-    }
-  };
+      console.log("✅ Usuario creado en auth.users:", data);
 
-  // ======================================
-  // (2) Cargar auth.users y crear en public.users
-  // ======================================
-  const fetchAuthUsers = async () => {
-    try {
-      // Listar usuarios de auth
-      const { data, error } = await supabase.auth.admin.listUsers();
-      if (error) {
-        console.error("❌ Error al listar auth.users:", error.message);
-      } else {
-        // Ajusta la forma de parsear data según la versión
-        const list = data.users || [];
-        setAuthUsers(list as AuthUser[]);
+      // 2) Llamar a la función con SECURITY DEFINER para insertar en public.users
+      const { user } = data;
+      if (user) {
+        const { error: rpcError } = await supabase.rpc("create_user_in_public", {
+          p_id: user.id,
+          p_email: registerEmail,
+          p_name: registerName,
+          p_rol_id: 2, // rol "user" por defecto, ajusta según necesites
+        });
+
+        if (rpcError) {
+          console.error("❌ Error al ejecutar create_user_in_public:", rpcError.message);
+          setRegisterError("Error al completar el registro en public.users (RPC falló).");
+        } else {
+          console.log("✅ Usuario agregado a public.users vía SECURITY DEFINER function");
+          await fetchAllData();
+          closeRegisterModal();
+        }
       }
-    } catch (e) {
-      console.error("❌ Error al listar auth.users:", e);
+    } catch (err: unknown) {
+      console.error("❌ Error general al registrar usuario:", err);
+      setRegisterError(String(err));
+    } finally {
+      setRegisterLoading(false);
     }
   };
 
-  // Abre el modal "crear usuario en public" pero partiendo de un usuario ya invitado (authUser)
-  const openCreateModalFromAuthUser = (authUser: AuthUser) => {
-    setSelectedAuthUser(authUser);
-    setCreateName("");
-    setCreateRoleId(null);
-    setCreateError("");
-    setShowCreateModal(true);
-  };
-
-  const closeCreateModal = () => {
-    setShowCreateModal(false);
-    setSelectedAuthUser(null);
-  };
-
-  // Insertar en public.users usando ID/email del authUser
-  const handleCreateUser = async () => {
-    if (roles !== "admin") {
-      setCreateError("No tienes permisos para crear usuarios.");
-      return;
-    }
-    if (!selectedAuthUser) {
-      setCreateError("No hay usuario de auth seleccionado.");
-      return;
-    }
-    if (!createName || !createRoleId) {
-      setCreateError("Faltan campos obligatorios (nombre, rol).");
-      return;
-    }
-
-    try {
-      // Insertar en public.users
-      const { data, error } = await supabase
-        .from("users")
-        .insert([
-          {
-            id: selectedAuthUser.id, // El ID del authUser
-            email: selectedAuthUser.email,
-            name: createName,
-            rol_id: createRoleId,
-          },
-        ])
-        .select();
-
-      if (error) {
-        setCreateError(error.message);
-        console.error("❌ Error al insertar usuario en public.users:", error.message);
-      } else {
-        console.log("✅ Usuario creado en public.users:", data);
-        await fetchAllData();
-        closeCreateModal();
-      }
-    } catch (e: unknown) {
-      console.error("❌ Error general al crear usuario:", e);
-      setCreateError(String(e));
-    }
-  };
-
-  // ======================================
-  // (3) EDITAR USUARIO (public.users)
-  // ======================================
+  // =========================
+  // EDITAR USUARIO
+  // =========================
   const openEditModal = (user: User) => {
     if (roles !== "admin") {
       alert("No tienes permisos para editar usuarios.");
@@ -283,9 +227,9 @@ const Users: React.FC = () => {
     }
   };
 
-  // ======================================
-  // (4) ELIMINAR USUARIO (public.users)
-  // ======================================
+  // =========================
+  // ELIMINAR USUARIO
+  // =========================
   const openDeleteModal = (user: User) => {
     if (roles !== "admin") {
       alert("No tienes permisos para eliminar usuarios.");
@@ -332,57 +276,20 @@ const Users: React.FC = () => {
     }
   };
 
-  // PINTA
+  // =========================
+  // RENDER
+  // =========================
   return (
     <div className="p-4">
-      {/* BOTONES DE INVITAR Y CARGAR AUTH USERS */}
-      <div className="flex justify-end space-x-2 mb-4">
+      {/* BOTÓN PARA CREAR USUARIO (abre modal Register) */}
+      <div className="flex justify-end mb-4">
         <button
-          onClick={openInviteModal}
-          className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded"
+          onClick={openRegisterModal}
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
         >
-          Invitar Usuario (auth)
-        </button>
-
-        <button
-          onClick={fetchAuthUsers}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded"
-        >
-          Cargar auth.users
+          Crear Usuario
         </button>
       </div>
-
-      {/* Tabla con authUsers para crear en public */}
-      {authUsers.length > 0 && (
-        <div className="bg-white shadow-md overflow-x-auto mb-6">
-          <h3 className="font-bold text-lg p-2">Usuarios en auth.users (no en public.users)</h3>
-          <table className="min-w-full text-xs border-collapse">
-            <thead className="bg-gray-200 text-gray-700">
-              <tr>
-                <th className="p-2 border border-gray-700 min-w-[220px]">Auth ID</th>
-                <th className="p-2 border border-gray-700 min-w-[220px]">Email</th>
-                <th className="p-2 border border-gray-700 min-w-[150px]">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {authUsers.map((authU) => (
-                <tr key={authU.id} className="border-b hover:bg-gray-100">
-                  <td className="p-2 border">{authU.id}</td>
-                  <td className="p-2 border">{authU.email}</td>
-                  <td className="p-2 border">
-                    <button
-                      onClick={() => openCreateModalFromAuthUser(authU)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded"
-                    >
-                      Crear en public.users
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
       {loading ? (
         <div className="text-center text-gray-500">Cargando usuarios...</div>
@@ -392,24 +299,12 @@ const Users: React.FC = () => {
             <table className="min-w-full text-xs border-collapse">
               <thead className="bg-gray-200 text-gray-700">
                 <tr>
-                  <th className="p-2 border border-gray-700 min-w-[180px]">
-                    ID (uuid)
-                  </th>
-                  <th className="p-2 border border-gray-700 min-w-[220px]">
-                    Email
-                  </th>
-                  <th className="p-2 border border-gray-700 min-w-[150px]">
-                    Nombre
-                  </th>
-                  <th className="p-2 border border-gray-700 min-w-[100px]">
-                    Rol
-                  </th>
-                  <th className="p-2 border border-gray-700 min-w-[150px]">
-                    Creado
-                  </th>
-                  <th className="p-2 border border-gray-700 min-w-[150px]">
-                    Acciones
-                  </th>
+                  <th className="p-2 border border-gray-700 min-w-[180px]">ID (uuid)</th>
+                  <th className="p-2 border border-gray-700 min-w-[220px]">Email</th>
+                  <th className="p-2 border border-gray-700 min-w-[150px]">Nombre</th>
+                  <th className="p-2 border border-gray-700 min-w-[100px]">Rol</th>
+                  <th className="p-2 border border-gray-700 min-w-[150px]">Creado</th>
+                  <th className="p-2 border border-gray-700 min-w-[150px]">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -419,19 +314,20 @@ const Users: React.FC = () => {
                     <td className="p-2 border">{item.email}</td>
                     <td className="p-2 border">{item.name}</td>
                     <td className="p-2 border">
-                      {rolesData.find((r) => r.id === item.rol_id)?.name ||
-                        "Sin rol"}
+                      {rolesData.find((r) => r.id === item.rol_id)?.name || "Sin rol"}
                     </td>
                     <td className="p-2 border">
                       {format(new Date(item.created_at), "dd/MM/yyyy HH:mm:ss")}
                     </td>
                     <td className="p-2 border">
+                      {/* Botón EDITAR */}
                       <button
                         onClick={() => openEditModal(item)}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
                       >
                         Editar
                       </button>
+                      {/* Botón ELIMINAR */}
                       <button
                         onClick={() => openDeleteModal(item)}
                         className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
@@ -454,125 +350,63 @@ const Users: React.FC = () => {
         </>
       )}
 
-      {/* Modal INVITAR (auth.users) */}
-      {showInviteModal && (
+      {/* MODAL REGISTER */}
+      {showRegisterModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Invitar Usuario (auth.users)</h2>
-              <button onClick={closeInviteModal} className="text-gray-500">✕</button>
+              <h2 className="text-xl font-bold">Registrar Usuario</h2>
+              <button onClick={closeRegisterModal} className="text-gray-500">✕</button>
             </div>
 
-            {inviteError && (
-              <p className="text-red-500 text-sm mb-2">{inviteError}</p>
+            {registerError && (
+              <p className="text-red-500 text-sm mb-4">{registerError}</p>
             )}
 
-            <div className="space-y-4">
-              <div>
-                <label className="block font-semibold">Email</label>
-                <input
-                  type="email"
-                  className="w-full p-2 border"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-2">
+            <form onSubmit={signUpUser} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Nombre"
+                value={registerName}
+                onChange={(e) => setRegisterName(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Correo electrónico"
+                value={registerEmail}
+                onChange={(e) => setRegisterEmail(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
               <button
-                onClick={closeInviteModal}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                type="submit"
+                disabled={registerLoading}
+                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
               >
-                Cancelar
+                {registerLoading ? "Registrando..." : "Registrarse"}
               </button>
-              <button
-                onClick={handleInviteUser}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-              >
-                Enviar Invitación
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* Modal CREAR en public.users (usando un authUser) */}
-      {showCreateModal && selectedAuthUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Crear en public.users</h2>
-              <button onClick={closeCreateModal} className="text-gray-500">
-                ✕
-              </button>
-            </div>
-
-            {createError && (
-              <p className="text-red-500 text-sm mb-2">{createError}</p>
-            )}
-
-            <div className="space-y-4">
-              <p className="text-sm">
-                ID: <span className="font-mono">{selectedAuthUser.id}</span>
-                <br />
-                Email: <span className="font-mono">{selectedAuthUser.email}</span>
-              </p>
-
-              <div>
-                <label className="block font-semibold">Nombre</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border"
-                  value={createName}
-                  onChange={(e) => setCreateName(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold">Rol</label>
-                <select
-                  className="w-full p-2 border"
-                  value={createRoleId ?? ""}
-                  onChange={(e) => setCreateRoleId(Number(e.target.value))}
-                >
-                  <option value="">Selecciona un rol...</option>
-                  {rolesData.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-2">
-              <button
-                onClick={closeCreateModal}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreateUser}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              >
-                Crear
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal EDITAR */}
+      {/* MODAL EDITAR */}
       {showEditModal && editUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Editar Usuario</h2>
-              <button onClick={closeEditModal} className="text-gray-500">
-                ✕
-              </button>
+              <button onClick={closeEditModal} className="text-gray-500">✕</button>
             </div>
 
             {editError && (
@@ -635,15 +469,13 @@ const Users: React.FC = () => {
         </div>
       )}
 
-      {/* Modal ELIMINAR */}
+      {/* MODAL ELIMINAR */}
       {showDeleteModal && deleteUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Eliminar Usuario</h2>
-              <button onClick={closeDeleteModal} className="text-gray-500">
-                ✕
-              </button>
+              <button onClick={closeDeleteModal} className="text-gray-500">✕</button>
             </div>
 
             {deleteError && (
