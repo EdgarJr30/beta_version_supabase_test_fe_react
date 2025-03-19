@@ -102,6 +102,9 @@ const Navbar = () => {
                                         <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
                                             <Link className="block w-full h-full" to="/tenant">Actualización Datos Empresa</Link>
                                         </li>
+                                        <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
+                                            <Link className="block w-full h-full" to="/AdmUsuarioCrear">Crear Usuario</Link>
+                                        </li>
                                     </ul>
                                 )}
                             </li>

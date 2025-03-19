@@ -13,37 +13,39 @@ export default function Register() {
     setLoading(true);
     setError('');
 
-    // 1️⃣ Crear usuario en auth.users
-    const { data, error } = await supabase.auth.signUp({
+    // 1) Crear usuario en auth.users
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { name }, // Guardar el nombre en metadata
+        data: { name }, // Opcional: guardar 'name' en la metadata
       },
     });
 
-    if (error) {
-      setError(error.message);
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
       return;
     }
 
     console.log("✅ Usuario creado en auth.users:", data);
 
-    // Insertar usuario en public.users con el mismo UUID
+    // 2) Llamar a la función con SECURITY DEFINER en la BD para insertar en public.users
     const { user } = data;
     if (user) {
-      const { error: userError } = await supabase
-        .from('users')
-        .insert([
-          { id: user.id, name, rol_id: 2 } // 2 = Usuario normal por defecto
-        ]);
+      // p_rol_id = 2 como ejemplo de "rol user"
+      const { error: rpcError } = await supabase.rpc('create_user_in_public', {
+        p_id: user.id,
+        p_email: email,
+        p_name: name,
+        p_rol_id: 2,
+      });
 
-      if (userError) {
-        console.error("❌ Error al insertar en public.users:", userError.message);
-        setError("Error al completar el registro.");
+      if (rpcError) {
+        console.error("❌ Error al ejecutar create_user_in_public:", rpcError.message);
+        setError("Error al completar el registro en public.users (RPC falló).");
       } else {
-        console.log("✅ Usuario agregado a public.users");
+        console.log("✅ Usuario agregado a public.users vía SECURITY DEFINER function");
       }
     }
 
