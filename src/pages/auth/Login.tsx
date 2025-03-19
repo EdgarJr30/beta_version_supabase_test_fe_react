@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AppVersion from '../../components/AppVersion';
 import TurnstileCaptcha from '../../components/TurnstileCaptcha';
+import { forgotPassword } from '../../utils/forgotPassword';
 
 export default function Login() {
     const { session } = useAuth();
@@ -36,6 +37,23 @@ export default function Login() {
         }
         else {
             console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
+        }
+    };
+
+    const handleForgotPassword = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        setError('');
+
+        if (!email) {
+            setError("Por favor, ingresa tu correo primero.");
+            return;
+        }
+
+        const { success, error: forgotError } = await forgotPassword(email);
+        if (!success) {
+            setError(forgotError || "Error al enviar el enlace de recuperación.");
+        } else {
+            alert("Se ha enviado un enlace de recuperación a tu correo.");
         }
     };
 
@@ -96,14 +114,14 @@ export default function Login() {
                                 <div className="flex items-center justify-between">
 
                                     <div className="text-sm/6">
-                                        <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                        <a href="#" onClick={handleForgotPassword} className="font-semibold text-indigo-600 hover:text-indigo-500">
                                             Olvidaste tu Contraseña?
                                         </a>
                                     </div>
                                 </div>
                                 {/* Captcha */}
                                 <div>
-                                   {!import.meta.env.DEV && <TurnstileCaptcha onSuccess={setCaptchaToken} />}
+                                    {!import.meta.env.DEV && <TurnstileCaptcha onSuccess={setCaptchaToken} />}
                                 </div>
                                 <div>
                                     <button
@@ -116,7 +134,7 @@ export default function Login() {
                             </form>
                             <p className="mt-10 text-center text-sm/6 text-gray-500">
                                 Desarrollado por {' '}
-                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                <a href="" className="font-semibold text-indigo-600 hover:text-indigo-500">
                                     Tejada Tech Group
                                 </a>
                             </p>
