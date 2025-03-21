@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
-import AppVersion from "../AppVersion";
 
 const Navbar = () => {
   // Extraemos roles para condicionar el menú y signOut para cerrar sesión
@@ -83,8 +82,6 @@ const Navbar = () => {
           {isMobileMenuOpen ? "✖️" : "☰"}
         </button>
       </div>
-
-      <AppVersion />
 
       {/* Menú principal */}
       <div
