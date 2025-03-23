@@ -24,8 +24,8 @@ export default function Example() {
             Frequently asked questions
           </h2>
           <dl className="mt-16 divide-y divide-gray-900/10">
-            {faqs.map((faq) => (
-              <Disclosure key={faq.question} as="div" className="py-6 first:pt-0 last:pb-0">
+            {faqs.map((faq, index) => (
+              <Disclosure key={`${faq.question}-${index}`} as="div" className="py-6 first:pt-0 last:pb-0">
                 <dt>
                   <DisclosureButton className="group flex w-full items-start justify-between text-left text-gray-900">
                     <span className="text-base/7 font-semibold">{faq.question}</span>
