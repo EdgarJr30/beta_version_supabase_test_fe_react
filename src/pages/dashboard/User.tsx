@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationProvider";
 import { supabase } from "../../lib/supabaseClient";
@@ -66,15 +66,7 @@ const Users: React.FC = () => {
   // =========================
   // Cargar usuarios y roles
   // =========================
-  useEffect(() => {
-    if (roles === "admin" || roles === "user") {
-      fetchAllData();
-    } else {
-      setLoading(false);
-    }
-  }, [roles]);
-
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
       // Cargar usuarios de public.users
@@ -101,7 +93,15 @@ const Users: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [notifyToast, notifySwal]);
+
+  useEffect(() => {
+    if (roles === "admin" || roles === "user") {
+      fetchAllData();
+    } else {
+      setLoading(false);
+    }
+  }, [roles, fetchAllData]);
 
   // =========================
   // ABRIR/CERRAR MODAL "REGISTER"
