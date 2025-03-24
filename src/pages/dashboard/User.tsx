@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useNotification } from "../../context/NotificationProvider";
 import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
 import Pagination from "../../components/ui/Pagination";
@@ -23,6 +24,7 @@ interface User {
 
 const Users: React.FC = () => {
   const { roles } = useAuth(); // "admin" | "user" | etc.
+  const { notifyToast, notifySwal } = useNotification();
   const [usersData, setUsersData] = useState<User[]>([]);
   const [rolesData, setRolesData] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +82,7 @@ const Users: React.FC = () => {
         .from("users")
         .select("*");
       if (usersError) {
-        console.error("❌ Error fetching users:", usersError.message);
+        notifyToast(`Error fetching users: ${usersError.message}`, "error");
       } else {
         setUsersData(users || []);
       }
@@ -90,10 +92,12 @@ const Users: React.FC = () => {
         .from("roles")
         .select("*");
       if (rolesError) {
-        console.error("❌ Error fetching roles:", rolesError.message);
+        notifyToast(`Error fetching users: ${rolesError.message}`, "error");
       } else {
         setRolesData(rolesResult || []);
       }
+    } catch (err) {
+      notifySwal(`Error general al cargar datos: ${String(err)}`, "error");
     } finally {
       setLoading(false);
     }
@@ -134,11 +138,12 @@ const Users: React.FC = () => {
       });
 
       if (signUpError) {
-        setRegisterError(signUpError.message);
+        notifySwal(`Error signing up user: ${signUpError.message}`, "error");
         setRegisterLoading(false);
         return;
       }
       console.log("✅ Usuario creado en auth.users:", data);
+      notifyToast("✅ Usuario creado", "success");
 
       // 2) Llamar a la función con SECURITY DEFINER para insertar en public.users
       const { user } = data;
@@ -151,16 +156,16 @@ const Users: React.FC = () => {
         });
 
         if (rpcError) {
-          console.error("❌ Error al ejecutar create_user_in_public:", rpcError.message);
-          setRegisterError("Error al completar el registro en public.users (RPC falló).");
+          notifySwal(`Error executing function create_user_in_public: ${rpcError.message} (RPC failed)`, "error");
+          setRegisterError("Error al completar el registro en public.users (RPC failed).");
         } else {
-          console.log("✅ Usuario agregado a public.users vía SECURITY DEFINER function");
           await fetchAllData();
           closeRegisterModal();
         }
       }
     } catch (err: unknown) {
       console.error("❌ Error general al registrar usuario:", err);
+      notifySwal(`Error registrating user: ${err}`, "error");
       setRegisterError(String(err));
     } finally {
       setRegisterLoading(false);
@@ -172,7 +177,7 @@ const Users: React.FC = () => {
   // =========================
   const openEditModal = (user: User) => {
     if (roles !== "admin") {
-      alert("No tienes permisos para editar usuarios.");
+      notifyToast("No tienes permisos para editar usuarios.", "error");
       return;
     }
     setEditUser(user);
@@ -190,15 +195,15 @@ const Users: React.FC = () => {
 
   const handleUpdateUser = async () => {
     if (roles !== "admin") {
-      setEditError("No tienes permisos para editar usuarios.");
+      notifyToast("No tienes permisos para editar usuarios.", "error");
       return;
     }
     if (!editUser) {
-      setEditError("No hay usuario seleccionado para editar.");
+      notifyToast("No hay usuario seleccionado para editar.", "error");
       return;
     }
     if (!editEmail || !editName || !editRoleId) {
-      setEditError("Faltan campos obligatorios (email, nombre, rol).");
+      notifyToast("Faltan campos obligatorios (email, nombre, rol).", "error");
       return;
     }
 
@@ -214,16 +219,18 @@ const Users: React.FC = () => {
         .select();
 
       if (error) {
-        setEditError(error.message);
+        notifySwal(`Error updating user at schema public.users: ${error.message}`, "error");
         console.error("❌ Error al editar usuario en public.users:", error.message);
       } else {
+        notifyToast(`Usuario actualizado`, "success");
         console.log("✅ Usuario actualizado en public.users:", data);
+
         await fetchAllData();
         closeEditModal();
       }
     } catch (e: unknown) {
+      notifySwal(`Error updating user at schema public.users: ${String(e)}`, "error");
       console.error("❌ Error general al actualizar usuario:", e);
-      setEditError(String(e));
     }
   };
 
@@ -232,7 +239,7 @@ const Users: React.FC = () => {
   // =========================
   const openDeleteModal = (user: User) => {
     if (roles !== "admin") {
-      alert("No tienes permisos para eliminar usuarios.");
+      notifyToast("No tienes permisos para eliminar usuarios.", "error");
       return;
     }
     setDeleteUser(user);
@@ -247,11 +254,11 @@ const Users: React.FC = () => {
 
   const handleDeleteUser = async () => {
     if (roles !== "admin") {
-      setDeleteError("No tienes permisos para eliminar usuarios.");
+      notifyToast("No tienes permisos para eliminar usuarios.", "error");
       return;
     }
     if (!deleteUser) {
-      setDeleteError("No hay usuario seleccionado para eliminar.");
+      notifyToast("No hay usuario seleccionado para eliminar.", "error");
       return;
     }
 
@@ -264,13 +271,16 @@ const Users: React.FC = () => {
 
       if (error) {
         setDeleteError(error.message);
+        notifySwal(`Error deleting user at schema public.users: ${error.message}`, "error");
         console.error("❌ Error al eliminar usuario en public.users:", error.message);
       } else {
+        notifyToast(`Usuario eliminado`, "success");
         console.log("✅ Usuario eliminado en public.users:", data);
         await fetchAllData();
         closeDeleteModal();
       }
     } catch (e: unknown) {
+      notifySwal(`Error deleting user: ${e}`, "error");
       console.error("❌ Error general al eliminar usuario:", e);
       setDeleteError(String(e));
     }
