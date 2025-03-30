@@ -5,7 +5,7 @@ interface ModalOpcionesProps {
   onClose: () => void;
   urlConsultaQR: string | null;
   position: { top: number; left: number };
-  onShowXml: () => void; // Nueva prop para abrir el modal XML
+  onShowXml?: () => void;
 }
 
 const ModalOpciones: React.FC<ModalOpcionesProps> = ({
@@ -57,7 +57,7 @@ const ModalOpciones: React.FC<ModalOpcionesProps> = ({
           className="px-2 hover:bg-gray-100 cursor-pointer text-green-500"
           onClick={() => {
             onClose();
-            onShowXml();
+            if (onShowXml) onShowXml();
           }}
         >
           Descargar XML
