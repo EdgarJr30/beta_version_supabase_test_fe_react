@@ -1,6 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from "react";
+import { supabase } from "../../lib/supabaseClient";
+
+interface Certificate {
+  id: number;
+  name: string;
+  pkcs12_data: string | null;
+  password: string | null;
+  expiration_date: string | null;
+  created_at: string;
+}
 
 export default function UpdateDigitalCertificate() {
+  const [currentCert, setCurrentCert] = useState<Certificate | null>(null);
+
   const [file, setFile] = useState<File | null>(null);
   const [clave, setClave] = useState("");
   const [repetirClave, setRepetirClave] = useState("");
@@ -9,12 +21,32 @@ export default function UpdateDigitalCertificate() {
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    fetchCurrentCertificate();
+  }, []);
+
+  const fetchCurrentCertificate = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("certificate")
+        .select("*")
+        .single(); // Toma el primero que encuentre
+
+      if (error) {
+        console.error("Error al obtener el certificado actual:", error);
+      } else {
+        setCurrentCert(data);
+      }
+    } catch (err) {
+      console.error("Error al obtener el certificado actual:", err);
+    }
+  };
+
   // Función para validar que el archivo tenga extensión .p12
   const isValidFile = (file: File) => {
     return file.name.toLowerCase().endsWith(".p12");
   };
 
-  // Manejador de archivo (input tradicional)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
@@ -50,16 +82,13 @@ export default function UpdateDigitalCertificate() {
     setDragActive(false);
   };
 
-  // Función para borrar el archivo cargado
   const clearFile = () => {
     setFile(null);
   };
 
-  // Manejador de submit (simula la lectura y envío del certificado y la contraseña)
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Validación de campos obligatorios
     if (!file) {
       alert("Debes subir el archivo .p12");
       return;
@@ -75,191 +104,267 @@ export default function UpdateDigitalCertificate() {
 
     setLoading(true);
 
-    // Crear objeto FormData para enviar al backend (simulado)
-    const formData = new FormData();
-    formData.append("certFile", file);
-    formData.append("clave", clave);
-
-    // Simulación de envío: se lee el archivo con FileReader y se simula una carga
     const reader = new FileReader();
-    reader.onload = () => {
-      const fileContent = reader.result;
-      console.log("Simulando envío del certificado y la contraseña:");
-      console.log("Contenido del archivo:", fileContent);
-      console.log("Contraseña:", clave);
-      // Simulamos un tiempo de carga (2 segundos)
-      setTimeout(() => {
-        alert("Certificado enviado correctamente (simulación).");
-        // Resetear todos los campos
-        setFile(null);
-        setClave("");
-        setRepetirClave("");
+    reader.onload = async () => {
+      try {
+        const base64Content = reader.result as string;
+
+        const { data, error } = await supabase
+          .from("certificate")
+          .insert([
+            {
+              pkcs12_data: base64Content,
+              password: clave,
+              name: file.name,
+            },
+          ])
+          .select("*");
+
+        if (error) {
+          alert("Error al guardar el certificado en la base de datos.");
+          console.error(error);
+        } else if (data && data.length > 0) {
+          alert("Certificado guardado exitosamente.");
+          setFile(null);
+          setClave("");
+          setRepetirClave("");
+
+          fetchCurrentCertificate();
+        }
+      } catch (err) {
+        console.error("Error al insertar el certificado:", err);
+      } finally {
         setLoading(false);
-      }, 2000);
+      }
     };
+
     reader.onerror = () => {
       alert("Error al leer el archivo.");
       setLoading(false);
     };
-    // Se lee el archivo como Data URL; puedes cambiar a readAsText si lo prefieres
+
     reader.readAsDataURL(file);
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow space-y-6">
-      <h1 className="text-xl font-bold">Actualizar Certificado Digital</h1>
-      <p className="text-sm text-gray-500">
-        Archivo proporcionado por la Dirección General de Impuestos Internos (DGII) formato p12
-      </p>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="fileInput" className="block text-sm font-medium text-gray-700 mb-1">
-            Subir Archivo (Drag and Drop)
-          </label>
-          <div
-            className={`border-2 ${dragActive ? "border-blue-500" : "border-gray-300"} border-dashed p-4 rounded text-center`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-          >
-            <p className="text-sm text-gray-600">
-              {file ? file.name : "Arrastra y suelta el archivo aquí, o haz click para seleccionar"}
-            </p>
-            <input
-              id="fileInput"
-              type="file"
-              accept=".p12,.pfx"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <label htmlFor="fileInput" className="cursor-pointer text-blue-500 underline">
-              Seleccionar archivo
+    <div className="max-w-7xl mx-auto p-4">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex-1 p-6 bg-white rounded shadow space-y-4">
+          <h1 className="text-xl font-bold">Firma Digital Actual</h1>
+
+          {/* Empresa */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Empresa:
             </label>
-            {file && (
-              <button
-                type="button"
-                onClick={clearFile}
-                className="mt-2 text-red-500 underline"
+            <input
+              type="text"
+              readOnly
+              className="border p-2 w-full rounded bg-gray-100"
+              value={currentCert?.name ?? ""}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fecha de Caducidad:
+            </label>
+            <input
+              type="text"
+              readOnly
+              className="border p-2 w-full rounded bg-gray-100"
+              value={
+                currentCert?.expiration_date
+                  ? new Date(currentCert.expiration_date).toLocaleString()
+                  : ""
+              }
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Clave:
+            </label>
+            <input
+              type="text"
+              readOnly
+              className="border p-2 w-full rounded bg-gray-100"
+              value="-----"
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 p-6 bg-white rounded shadow space-y-6">
+          <h1 className="text-xl font-bold">Nueva Firma Digital</h1>
+          <p className="text-sm text-gray-500">
+            Archivo proporcionado por la Dirección General de Impuestos Internos
+            (DGII) formato p12
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="fileInput"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Borrar archivo
-              </button>
-            )}
-          </div>
-        </div>
+                Subir Archivo (Drag and Drop)
+              </label>
+              <div
+                className={`border-2 ${dragActive ? "border-blue-500" : "border-gray-300"
+                  } border-dashed p-4 rounded text-center`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+              >
+                <p className="text-sm text-gray-600">
+                  {file
+                    ? file.name
+                    : "Arrastra y suelta el archivo aquí, o haz click para seleccionar"}
+                </p>
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept=".p12,.pfx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="fileInput"
+                  className="cursor-pointer text-blue-500 underline"
+                >
+                  Seleccionar archivo
+                </label>
+                {file && (
+                  <button
+                    type="button"
+                    onClick={clearFile}
+                    className="mt-2 text-red-500 underline"
+                  >
+                    Borrar archivo
+                  </button>
+                )}
+              </div>
+            </div>
 
-        {/* Campo de Clave */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Clave</label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={clave}
-              onChange={(e) => setClave(e.target.value)}
-              className="border p-2 w-full rounded pr-10"
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Clave
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={clave}
+                  onChange={(e) => setClave(e.target.value)}
+                  className="border p-2 w-full rounded pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M4.264 19.736C5.53 21.935 8.283 24 12 24c3.717 0 6.47-2.065 7.736-4.264M4.264 19.736l14.472-14.472"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M3.98 8.223c-1.076 1.72-1.076 4.28 0 6 1.27 2.163 4.177 5.223 8.02 5.223 3.843 0 6.75-3.06 8.02-5.223 1.076-1.72 1.076-4.28 0-6"
+                      />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Repetir Clave
+              </label>
+              <div className="relative">
+                <input
+                  type={showRepeatPassword ? "text" : "password"}
+                  value={repetirClave}
+                  onChange={(e) => setRepetirClave(e.target.value)}
+                  className="border p-2 w-full rounded"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+                  tabIndex={-1}
+                >
+                  {showRepeatPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M3.98 8.223c-1.076 1.72-1.076 4.28 0 6 1.27 2.163 4.177 5.223 8.02 5.223 3.843 0 6.75-3.06 8.02-5.223 1.076-1.72 1.076-4.28 0-6"
+                      />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M3.98 8.223c-1.076 1.72-1.076 4.28 0 6 1.27 2.163 4.177 5.223 8.02 5.223 3.843 0 6.75-3.06 8.02-5.223 1.076-1.72 1.076-4.28 0-6"
+                      />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
-              tabIndex={-1}
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              disabled={loading}
             >
-              {showPassword ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M4.264 19.736C5.53 21.935 8.283 24 12 24c3.717 0 6.47-2.065 7.736-4.264M4.264 19.736l14.472-14.472"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M3.98 8.223c-1.076 1.72-1.076 4.28 0 6 1.27 2.163 4.177 5.223 8.02 5.223 3.843 0 6.75-3.06 8.02-5.223 1.076-1.72 1.076-4.28 0-6"
-                  />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              )}
+              {loading ? "Cargando..." : "Guardar"}
             </button>
-          </div>
+          </form>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Repetir Clave</label>
-          <div className="relative">
-            <input
-              type={showRepeatPassword ? "text" : "password"}
-              value={repetirClave}
-              onChange={(e) => setRepetirClave(e.target.value)}
-              className="border p-2 w-full rounded"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowRepeatPassword(!showRepeatPassword)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
-              tabIndex={-1}
-            >
-              {showRepeatPassword ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M4.264 19.736C5.53 21.935 8.283 24 12 24c3.717 0 6.47-2.065 7.736-4.264M4.264 19.736l14.472-14.472"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.98 8.223C5.25 6.06 8.157 3 12 3c3.843 0 6.75 3.06 8.02 5.223M3.98 8.223c-1.076 1.72-1.076 4.28 0 6 1.27 2.163 4.177 5.223 8.02 5.223 3.843 0 6.75-3.06 8.02-5.223 1.076-1.72 1.076-4.28 0-6"
-                  />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-          disabled={loading}
-        >
-          {loading ? "Cargando..." : "Guardar"}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
