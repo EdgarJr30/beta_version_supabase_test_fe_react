@@ -12,6 +12,7 @@ interface Certificate {
 
 export default function UpdateDigitalCertificate() {
   const [currentCert, setCurrentCert] = useState<Certificate | null>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [clave, setClave] = useState("");
@@ -23,6 +24,7 @@ export default function UpdateDigitalCertificate() {
 
   useEffect(() => {
     fetchCurrentCertificate();
+    fetchCompanyName();
   }, []);
 
   const fetchCurrentCertificate = async () => {
@@ -39,6 +41,23 @@ export default function UpdateDigitalCertificate() {
       }
     } catch (err) {
       console.error("Error al obtener el certificado actual:", err);
+    }
+  };
+
+  const fetchCompanyName = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("tenant")
+        .select("fiscal_name")
+        .single();
+
+      if (error) {
+        console.error("Error al obtener el nombre de la empresa:", error.message);
+      } else if (data) {
+        setCompanyName(data.fiscal_name);
+      }
+    } catch (err) {
+      console.error("Error al obtener el nombre de la empresa:", err);
     }
   };
 
@@ -161,7 +180,7 @@ export default function UpdateDigitalCertificate() {
               type="text"
               readOnly
               className="border p-2 w-full rounded bg-gray-100"
-              value={currentCert?.name ?? ""}
+              value={companyName ?? ""}
             />
           </div>
 
