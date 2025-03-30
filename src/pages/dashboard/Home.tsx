@@ -1,5 +1,18 @@
+
+import React, { useState, useEffect } from "react";
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
 import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/react/24/outline'
+import { supabase } from "../../lib/supabaseClient";
+
+interface Certificate {
+  id: number;
+  name: string;
+  pkcs12_data: string | null;
+  password: string | null;
+  expiration_date: string | null;
+  created_at: string;
+}
+
 
 const stats = [
   { id: 1, name: 'Total Subscribers', stat: '71,897', icon: UsersIcon, change: '122', changeType: 'increase' },
@@ -12,6 +25,7 @@ function classNames(...classes: string[]) {
 }
 
 export default function Home() {
+  const [currentCert, setCurrentCert] = useState<Certificate | null>(null);
 
   function getFormattedDate(date: Date = new Date()): string {
     const months = [
@@ -25,6 +39,27 @@ export default function Home() {
 
     return `${day} de ${month} del ${year}`;
   }
+
+  const fetchCurrentCertificate = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("certificate")
+        .select("*")
+        .single(); // Toma el primer registro encontrado
+
+      if (error) {
+        console.error("Error al obtener el certificado:", error);
+      } else {
+        setCurrentCert(data);
+      }
+    } catch (err) {
+      console.error("Error al obtener el certificado:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentCertificate();
+  }, []);
 
   return (
     <>
@@ -41,7 +76,15 @@ export default function Home() {
             {/* Vigencia Certificado */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <span className="font-semibold whitespace-nowrap">Vigencia Certificado Digital Hasta:</span>
-              <span>12 de marzo de 2025</span>
+              <span>
+                {currentCert?.expiration_date
+                  ? new Date(currentCert.expiration_date).toLocaleDateString("es-ES", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                  : "No disponible"}
+              </span>
               <a href="/AdmCertificadoDigital" className="text-blue-500">Actualizar</a>
             </div>
 
