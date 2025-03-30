@@ -5,9 +5,16 @@ interface ModalOpcionesProps {
   onClose: () => void;
   urlConsultaQR: string | null;
   position: { top: number; left: number };
+  onShowXml: () => void; // Nueva prop para abrir el modal XML
 }
 
-const ModalOpciones: React.FC<ModalOpcionesProps> = ({ isOpen, onClose, urlConsultaQR, position }) => {
+const ModalOpciones: React.FC<ModalOpcionesProps> = ({
+  isOpen,
+  onClose,
+  urlConsultaQR,
+  position,
+  onShowXml,
+}) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,11 +50,27 @@ const ModalOpciones: React.FC<ModalOpcionesProps> = ({ isOpen, onClose, urlConsu
       style={{ top: position.top, left: position.left }}
     >
       <ul className="space-y-3">
-        <li className="px-2 hover:bg-gray-100 cursor-pointer text-blue-500">Descargar PDF</li>
-        <li className="px-2 hover:bg-gray-100 cursor-pointer text-green-500">Descargar XML</li>
-        <li className="px-2 hover:bg-gray-100 cursor-pointer text-orange-500">Ver Request</li>
-        <li className="px-2 hover:bg-gray-100 cursor-pointer text-yellow-500">Ver Response</li>
-        <li className="px-2 hover:bg-gray-100 cursor-pointer text-red-500">Reenviar</li>
+        <li className="px-2 hover:bg-gray-100 cursor-pointer text-blue-500">
+          Descargar PDF
+        </li>
+        <li
+          className="px-2 hover:bg-gray-100 cursor-pointer text-green-500"
+          onClick={() => {
+            onClose();
+            onShowXml();
+          }}
+        >
+          Descargar XML
+        </li>
+        <li className="px-2 hover:bg-gray-100 cursor-pointer text-orange-500">
+          Ver Request
+        </li>
+        <li className="px-2 hover:bg-gray-100 cursor-pointer text-yellow-500">
+          Ver Response
+        </li>
+        <li className="px-2 hover:bg-gray-100 cursor-pointer text-red-500">
+          Reenviar
+        </li>
         <li
           className="px-2 hover:bg-gray-100 cursor-pointer text-indigo-500"
           onClick={() => urlConsultaQR && window.open(urlConsultaQR, "_blank")}

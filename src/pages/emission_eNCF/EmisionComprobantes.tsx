@@ -5,7 +5,8 @@ import usePagination from "../../hooks/usePagination";
 import Pagination from '../../components/ui/Pagination';
 import Filters from "../../components/ui/Filters";
 import ModalOpciones from "../../components/ModalOpciones";
-import {tipoDocumentoOptions} from '../../utils/documentTypes'
+import ModalXml from "../../components/ModalXml";
+import { tipoDocumentoOptions } from '../../utils/documentTypes'
 interface EmisionComprobante {
   id: number;
   emisor_rnc: string;
@@ -54,6 +55,7 @@ const EmisionComprobantes: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFactura, setSelectedFactura] = useState<EmisionComprobante | null>(null);
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+  const [isXmlModalOpen, setIsXmlModalOpen] = useState(false);
   const [estado, setEstado] = useState("Todos");
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
@@ -121,6 +123,11 @@ const EmisionComprobantes: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // Callback para abrir el modal XML desde ModalOpciones
+  const handleShowXml = () => {
+    setIsXmlModalOpen(true);
+  };
+
 
   return (
     <div className="">
@@ -150,6 +157,14 @@ const EmisionComprobantes: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         urlConsultaQR={selectedFactura?.url_consulta_qr ?? null}
         position={modalPosition}
+        onShowXml={handleShowXml}
+      />
+
+      {/* Modal XML */}
+      <ModalXml
+        isOpen={isXmlModalOpen}
+        onClose={() => setIsXmlModalOpen(false)}
+        xmlBase64={selectedFactura?.document_xml ?? null}
       />
 
       {/* Loader */}
