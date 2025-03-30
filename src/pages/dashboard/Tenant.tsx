@@ -45,7 +45,10 @@ export default function Tenant() {
     fetchTenant();
   }, [roles]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Se actualiza para que acepte tanto inputs como selects
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     if (tenant) {
       setTenant({ ...tenant, [e.target.name]: e.target.value });
     }
@@ -83,7 +86,11 @@ export default function Tenant() {
   };
 
   if (roles !== "admin") {
-    return <p className="text-red-500 text-center">No tienes permisos para acceder a esta página.</p>;
+    return (
+      <p className="text-red-500 text-center">
+        No tienes permisos para acceder a esta página.
+      </p>
+    );
   }
 
   return (
@@ -179,13 +186,16 @@ export default function Tenant() {
             </div>
             <div>
               <label className="font-semibold">Ambiente</label>
-              <input
-                type="text"
+              <select
                 name="environment"
                 value={tenant.environment}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-              />
+              >
+                <option value="testecf">testecf</option>
+                <option value="certecf">certecf</option>
+                <option value="ecf">ecf</option>
+              </select>
             </div>
           </div>
 
