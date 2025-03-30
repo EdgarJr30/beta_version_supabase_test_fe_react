@@ -123,6 +123,22 @@ const AprobacionComprobantes: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    // NUEVO: Botones de ejemplo (PDF, XML, Aprobación Comercial)
+    // Estas funciones son de ejemplo; ajusta la lógica según tus necesidades.
+    const handlePdfClick = (factura: RecepcionComprobante) => {
+        console.log("PDF de:", factura.numero_documento);
+        // Lógica para descargar/mostrar PDF
+    };
+
+    const handleXmlClick = (factura: RecepcionComprobante) => {
+        console.log("XML de:", factura.numero_documento);
+        // Lógica para descargar/mostrar XML
+    };
+
+    const handleAprobacionClick = (factura: RecepcionComprobante) => {
+        console.log("Aprobación Comercial de:", factura.numero_documento);
+        // Lógica de aprobación comercial
+    };
 
     return (
         <div className="">
@@ -162,6 +178,11 @@ const AprobacionComprobantes: React.FC = () => {
                         <table className="min-w-full text-xs border-collapse ">
                             <thead className="bg-gray-200 text-gray-700">
                                 <tr>
+                                    {/* NUEVO: 3 columnas para PDF, XML y Aprobación Comercial */}
+                                    <th className="p-2 border border-gray-700">PDF</th>
+                                    <th className="p-2 border border-gray-700">XML</th>
+                                    <th className="p-2 border border-gray-700">Aprob. Comercial</th>
+
                                     <th className="p-2 border border-gray-700 min-w-[60px]">Acciones</th>
                                     <th className="p-2 border border-gray-700 min-w-[120px]">RNC Emisor</th>
                                     <th className="p-2 border border-gray-700 min-w-[150px]">Razón Social Emisor</th>
@@ -202,6 +223,25 @@ const AprobacionComprobantes: React.FC = () => {
                             <tbody>
                                 {paginatedComprobantes.map((item) => (
                                     <tr key={item.id} className="hover:bg-gray-100 border-b">
+                                        {/* NUEVO: Botones PDF, XML y Aprobación Comercial */}
+                                        <td className="p-2 border text-center">
+                                            <button onClick={() => handlePdfClick(item)}>
+                                                {/* <img src="/icons/pdf-icon.png" alt="PDF" className="w-6 h-6 mx-auto" /> */}
+                                                PDF
+                                            </button>
+                                        </td>
+                                        <td className="p-2 border text-center">
+                                            <button onClick={() => handleXmlClick(item)}>
+                                                {/* <img src="/icons/xml-icon.png" alt="XML" className="w-6 h-6 mx-auto" /> */}
+                                                XML
+                                            </button>
+                                        </td>
+                                        <td className="p-2 border text-center">
+                                            <button onClick={() => handleAprobacionClick(item)}>
+                                                {/* <img src="/icons/aprobacion-icon.png" alt="Aprobación" className="w-6 h-6 mx-auto" /> */}
+                                                Aprobación
+                                            </button>
+                                        </td>
                                         <td className="p-3 text-center">
                                             <button onClick={(event) => handleToggleModal(event, item)} className="text-xl">...</button>
                                         </td>
