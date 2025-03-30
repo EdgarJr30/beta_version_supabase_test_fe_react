@@ -221,7 +221,7 @@ const Roles: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
+    <div>
       <div className="flex justify-end mb-4">
         <button
           onClick={openCreateModal}
