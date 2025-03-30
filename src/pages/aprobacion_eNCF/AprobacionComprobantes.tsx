@@ -5,9 +5,9 @@ import usePagination from "../../hooks/usePagination";
 import Pagination from '../../components/ui/Pagination';
 import Filters from "../../components/ui/Filters";
 import ModalOpciones from "../../components/ModalOpciones";
-import {tipoDocumentoOptions} from '../../utils/documentTypes'
+import { tipoDocumentoOptions } from '../../utils/documentTypes'
 
-interface EmisionComprobante {
+interface RecepcionComprobante {
     id: number;
     emisor_rnc: string;
     emisor_razon_social: string;
@@ -47,13 +47,13 @@ interface EmisionComprobante {
 
 const AprobacionComprobantes: React.FC = () => {
     const { roles } = useAuth();
-    const [comprobantes, setComprobantes] = useState<EmisionComprobante[]>([]);
+    const [comprobantes, setComprobantes] = useState<RecepcionComprobante[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [rncReceptor, setRncReceptor] = useState("");
     const [tipoDocumento, setTipoDocumento] = useState("Todos");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedFactura, setSelectedFactura] = useState<EmisionComprobante | null>(null);
+    const [selectedFactura, setSelectedFactura] = useState<RecepcionComprobante | null>(null);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [estado, setEstado] = useState("Todos");
     const [fechaDesde, setFechaDesde] = useState("");
@@ -72,7 +72,7 @@ const AprobacionComprobantes: React.FC = () => {
     const fetchComprobantes = async () => {
         setLoading(true);
         const { data, error } = await supabase
-            .from("emision_comprobantes")
+            .from("recepcion_comprobantes")
             .select(`
         "id","emisor_rnc", "emisor_razon_social", "receptor_rnc", "receptor_razon_social", 
         "numero_documento", "tipo_documento", "tipo_ecf", "es_rfc", "fecha_emision", 
@@ -114,7 +114,7 @@ const AprobacionComprobantes: React.FC = () => {
             itemsPerPage,
         });
 
-    const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>, factura: EmisionComprobante) => {
+    const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>, factura: RecepcionComprobante) => {
         event.stopPropagation();
         const rect = event.currentTarget.getBoundingClientRect();
 
