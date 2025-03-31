@@ -60,6 +60,9 @@ const AprobacionComprobantes: React.FC = () => {
     const [fechaHasta, setFechaHasta] = useState("");
     const itemsPerPage = 10;
 
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+
     useEffect(() => {
         if (roles === "admin" || roles === "user") {
             fetchComprobantes();
@@ -130,10 +133,30 @@ const AprobacionComprobantes: React.FC = () => {
         // Lógica para descargar/mostrar PDF
     };
 
-    const handleXmlClick = (factura: RecepcionComprobante) => {
+    const handleXmlClick = async (factura: RecepcionComprobante) => {
         console.log("XML de:", factura.numero_documento);
-        // Lógica para descargar/mostrar XML
+        try {
+            const response = await fetch("https://ztrmvfyqjcchmcmyitjg.supabase.co/functions/v1/get-xml", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    // Agrega el header de autorización si es necesario
+                    "Authorization": `Bearer ${supabaseAnonKey}`
+                },
+                body: JSON.stringify({ id: factura.id })
+            });
+            if (!response.ok) {
+                throw new Error("Error al obtener el XML")
+            }
+            const xml = await response.text();
+            // Aquí actualizas el estado para mostrar el modal con el contenido XML
+            // Por ejemplo, setModalContent(xml) y setIsModalOpen(true)
+            console.log("XML decodificado:", xml);
+        } catch (error) {
+            console.error("Error en handleXmlClick:", error);
+        }
     };
+
 
     const handleAprobacionClick = (factura: RecepcionComprobante) => {
         console.log("Aprobación Comercial de:", factura.numero_documento);
