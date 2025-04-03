@@ -109,10 +109,16 @@ export default function Tenant() {
               <label className="font-semibold">Identificación</label>
               <input
                 type="text"
+                name="fiscal_number"
                 value={tenant.fiscal_number}
-                className="w-full p-2 border bg-gray-200 rounded"
-                disabled
+                onChange={handleChange}
+                className={`w-full p-2 border rounded ${roles !== "super_admin"
+                  ? "bg-gray-200 cursor-not-allowed"
+                  : "bg-white"
+                  }`}
+                disabled={roles !== "super_admin"}
               />
+
             </div>
             <div>
               <label className="font-semibold">Razón Social *</label>
