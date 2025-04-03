@@ -48,7 +48,7 @@ const Roles: React.FC = () => {
 
   // Al montar, o cuando cambie "roles", cargamos la lista si es "admin" o "user"
   useEffect(() => {
-    if (roles === "admin" || roles === "user") {
+    if (roles === "super_admin" || roles === "admin" || roles === "user") {
       fetchRoles();
     } else {
       setLoading(false);
@@ -87,7 +87,7 @@ const Roles: React.FC = () => {
   };
 
   const handleCreateRole = async () => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       setCreateError("No tienes permisos para crear roles.");
       return;
     }
@@ -121,7 +121,7 @@ const Roles: React.FC = () => {
      EDITAR
   ======================== */
   const openEditModal = (role: Rol) => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       alert("No tienes permisos para editar roles.");
       return;
     }
@@ -138,7 +138,7 @@ const Roles: React.FC = () => {
   };
 
   const handleUpdateRole = async () => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       setEditError("No tienes permisos para editar roles.");
       return;
     }
@@ -175,7 +175,7 @@ const Roles: React.FC = () => {
      ELIMINAR
   ======================== */
   const openDeleteModal = (role: Rol) => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       alert("No tienes permisos para eliminar roles.");
       return;
     }
@@ -190,7 +190,7 @@ const Roles: React.FC = () => {
   };
 
   const handleDeleteRole = async () => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       setDeleteError("No tienes permisos para eliminar roles.");
       return;
     }

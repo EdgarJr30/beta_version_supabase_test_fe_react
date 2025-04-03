@@ -230,15 +230,15 @@ create or replace function public.create_user_in_public (
   p_rol_id int
 ) RETURNS void LANGUAGE plpgsql SECURITY DEFINER as $$
 BEGIN
-  -- 1) Verificar si el que llama (auth.uid()) es admin en public.users
+  -- 1) Verificar si el que llama (auth.uid()) es super_admin o admin en public.users
   IF NOT EXISTS (
     SELECT 1
       FROM public.users u
       JOIN public.roles r ON u.rol_id = r.id
      WHERE u.id = auth.uid()
-       AND r.name = 'admin'
+       AND r.name IN ('super_admin', 'admin')
   ) THEN
-    RAISE EXCEPTION 'Solo un admin puede crear usuarios en public.users';
+    RAISE EXCEPTION 'Solo un super_admin o un admin pueden crear usuarios en public.users';
   END IF;
 
   -- 2) Insertar en public.users con el mismo ID que existe en auth.users
@@ -482,3 +482,15 @@ select
 
 -- ### UPDATE
 -- ### DELETE
+
+INSERT INTO public.roles (name, description)
+VALUES ('super_admin', 'Rol con permisos de superadministrador');
+
+INSERT INTO public.roles (name, description)
+VALUES ('admin', 'Rol con permisos de aministrador');
+
+INSERT INTO public.roles (name, description)
+VALUES ('user', 'Rol con permisos de usario');
+
+INSERT INTO public.tenant (fiscal_number, fiscal_name, commercial_name, address, city, zipcode, phone, email, environment)
+VALUES ('fiscal_number', 'fiscal_name', 'commercial_name', 'address', 'city', 'zipcode', '8098000000', 'email@company.com', 'testecf');

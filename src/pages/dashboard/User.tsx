@@ -15,7 +15,7 @@ interface Role {
 }
 
 interface User {
-  id: string;         // uuid (public.users)
+  id: string;
   email: string;
   name: string;
   rol_id: number;
@@ -23,7 +23,7 @@ interface User {
 }
 
 const Users: React.FC = () => {
-  const { roles } = useAuth(); // "admin" | "user" | etc.
+  const { roles } = useAuth();
   const { notifyToast, notifySwal } = useNotification();
   const [usersData, setUsersData] = useState<User[]>([]);
   const [rolesData, setRolesData] = useState<Role[]>([]);
@@ -96,7 +96,7 @@ const Users: React.FC = () => {
   }, [notifyToast, notifySwal]);
 
   useEffect(() => {
-    if (roles === "admin" || roles === "user") {
+    if (roles === "super_admin" || roles === "admin" || roles === "user") {
       fetchAllData();
     } else {
       setLoading(false);
@@ -176,7 +176,7 @@ const Users: React.FC = () => {
   // EDITAR USUARIO
   // =========================
   const openEditModal = (user: User) => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       notifyToast("No tienes permisos para editar usuarios.", "error");
       return;
     }
@@ -194,7 +194,7 @@ const Users: React.FC = () => {
   };
 
   const handleUpdateUser = async () => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       notifyToast("No tienes permisos para editar usuarios.", "error");
       return;
     }
@@ -238,7 +238,7 @@ const Users: React.FC = () => {
   // ELIMINAR USUARIO
   // =========================
   const openDeleteModal = (user: User) => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       notifyToast("No tienes permisos para eliminar usuarios.", "error");
       return;
     }
@@ -253,7 +253,7 @@ const Users: React.FC = () => {
   };
 
   const handleDeleteUser = async () => {
-    if (roles !== "admin") {
+    if (roles !== "super_admin" && roles !== "admin") {
       notifyToast("No tienes permisos para eliminar usuarios.", "error");
       return;
     }

@@ -64,7 +64,7 @@ const AprobacionComprobantes: React.FC = () => {
 
 
     useEffect(() => {
-        if (roles === "admin" || roles === "user") {
+        if (roles === "super_admin" || roles === "admin" || roles === "user") {
             fetchComprobantes();
         } else {
             setLoading(false);

@@ -79,7 +79,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
 
     // Fetch de datos al montar o cuando cambia el rol
     useEffect(() => {
-        if (roles === "admin" || roles === "user") {
+        if (roles === "super_admin" || roles === "admin" || roles === "user") {
             fetchAnulaciones();
         } else {
             setLoading(false);

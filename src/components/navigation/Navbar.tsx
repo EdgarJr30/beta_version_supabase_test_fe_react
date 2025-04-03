@@ -104,7 +104,7 @@ const Navbar = () => {
             </li>
 
             {/* ADMINISTRACIÓN - solo admin */}
-            {roles === "admin" && (
+            {(roles === "super_admin" || roles === "admin") && (
               <li
                 className="relative"
                 onMouseEnter={() => handleMouseEnter("admin")}
@@ -147,7 +147,7 @@ const Navbar = () => {
             )}
 
             {/* EMISIÓN DE COMPROBANTES - admin o user */}
-            {(roles === "admin" || roles === "user") && (
+            {(roles === "super_admin" || roles === "admin" || roles === "user") && (
               <li
                 className="relative"
                 onMouseEnter={() => handleMouseEnter("emision")}
@@ -175,7 +175,7 @@ const Navbar = () => {
             )}
 
             {/* RECEPCIÓN DE COMPROBANTES - admin o testing */}
-            {(roles === "admin" || roles === "testing") && (
+            {(roles === "super_admin" || roles === "admin" || roles === "testing") && (
               <li
                 className="relative"
                 onMouseEnter={() => handleMouseEnter("recepcion")}

@@ -24,7 +24,7 @@ export default function Tenant() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (roles !== "admin") return;
+    if (roles !== "super_admin" && roles !== "admin") return;
 
     const fetchTenant = async () => {
       setLoading(true);
@@ -85,7 +85,7 @@ export default function Tenant() {
     setSaving(false);
   };
 
-  if (roles !== "admin") {
+  if (roles !== "super_admin" && roles !== "admin") {
     return (
       <p className="text-red-500 text-center">
         No tienes permisos para acceder a esta página.

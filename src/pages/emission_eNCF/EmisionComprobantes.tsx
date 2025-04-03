@@ -62,7 +62,7 @@ const EmisionComprobantes: React.FC = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    if (roles === "admin" || roles === "user") {
+    if (roles === "super_admin" || roles === "admin" || roles === "user") {
       fetchComprobantes();
     } else {
       setLoading(false);
