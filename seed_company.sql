@@ -256,7 +256,7 @@ execute on FUNCTION public.create_user_in_public (uuid, text, text, int) to auth
 
 -- ## Tabla Roles
 -- ### CREATE
-CREATE policy "Allow authenticated admin users to insert into roles" on "public"."roles" as PERMISSIVE for INSERT to authenticated
+CREATE policy "Allow authenticated super_admin and admin users to insert into roles" on "public"."roles" as PERMISSIVE for INSERT to authenticated
 with
   check (
     (
@@ -271,7 +271,7 @@ with
         where
           (
             (u.id = auth.uid ())
-            and (r.name = 'admin'::roles_type)
+            and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
           )
       )
     )
@@ -281,7 +281,7 @@ CREATE policy "Enable read access for all authenticated users" on "public"."role
 select
   to authenticated using (true);
 -- ### UPDATE
-CREATE policy "Allow authenticated admin users to update roles" on "public"."roles" as PERMISSIVE
+CREATE policy "Allow authenticated super_admin and admin users to update roles" on "public"."roles" as PERMISSIVE
 for update
   to authenticated using (
     (
@@ -296,13 +296,13 @@ for update
         where
           (
             (u.id = auth.uid ())
-            and (r.name = 'admin'::roles_type)
+            and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
           )
       )
     )
   );
 -- ### DELETE
-CREATE policy "Allow authenticated admin users to delete roles" on "public"."roles" as PERMISSIVE for DELETE to authenticated using (
+CREATE policy "Allow authenticated super_admin and admin users to delete roles" on "public"."roles" as PERMISSIVE for DELETE to authenticated using (
   (
     exists (
       select
@@ -315,7 +315,7 @@ CREATE policy "Allow authenticated admin users to delete roles" on "public"."rol
       where
         (
           (u.id = auth.uid ())
-          and (r.name = 'admin'::roles_type)
+          and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
         )
     )
   )
@@ -323,7 +323,7 @@ CREATE policy "Allow authenticated admin users to delete roles" on "public"."rol
 
 -- ## Tabla Usuarios
 -- ### CREATE
-create policy "Allow authenticated admin users to insert into users" on "public"."users" as PERMISSIVE for INSERT to authenticated
+create policy "Allow authenticated super_admin and admin users to insert into users" on "public"."users" as PERMISSIVE for INSERT to authenticated
 with
   check (
     (
@@ -338,7 +338,7 @@ with
         where
           (
             (u.id = auth.uid ())
-            and (r.name = 'admin'::roles_type)
+            and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
           )
       )
     )
@@ -350,7 +350,7 @@ select
   to authenticated using (true);
 
 -- ### UPDATE
-create policy "Allow authenticated admin users to update users" on "public"."users" as PERMISSIVE
+create policy "Allow authenticated super_admin and admin users to update users" on "public"."users" as PERMISSIVE
 for update
   to authenticated using (
     (
@@ -365,14 +365,14 @@ for update
         where
           (
             (u.id = auth.uid ())
-            and (r.name = 'admin'::roles_type)
+            and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
           )
       )
     )
   );
 
 -- ### DELETE
-create policy "Allow authenticated admin users to delete users" on "public"."users" as PERMISSIVE for DELETE to authenticated using (
+create policy "Allow authenticated super_admin and admin users to delete users" on "public"."users" as PERMISSIVE for DELETE to authenticated using (
   (
     exists (
       select
@@ -385,7 +385,7 @@ create policy "Allow authenticated admin users to delete users" on "public"."use
       where
         (
           (u.id = auth.uid ())
-          and (r.name = 'admin'::roles_type)
+          and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
         )
     )
   )
@@ -399,7 +399,7 @@ select
   to authenticated using (true);
 
 -- ### UPDATE
-create policy "Allow authenticated admin users to update tenants" on "public"."tenant" as PERMISSIVE
+create policy "Allow authenticated super_admin and admin users to update tenants" on "public"."tenant" as PERMISSIVE
 for update
   to authenticated using (
     (
@@ -414,7 +414,7 @@ for update
         where
           (
             (u.id = auth.uid ())
-            and (r.name = 'admin'::roles_type)
+            and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
           )
       )
     )
@@ -444,7 +444,7 @@ select
 
 -- ## Tabla Anulación eNCF
 -- ### CREATE
-create policy "Allow authenticated admin users to insert into ancef" on "public"."ancef" as PERMISSIVE for INSERT to authenticated
+create policy "Allow authenticated super_admin and admin users to insert into ancef" on "public"."ancef" as PERMISSIVE for INSERT to authenticated
 with
   check (
     (
@@ -459,7 +459,7 @@ with
         where
           (
             (u.id = auth.uid ())
-            and (r.name = 'admin'::roles_type)
+            and r.name IN ('admin'::roles_type, 'super_admin'::roles_type)
           )
       )
     )
