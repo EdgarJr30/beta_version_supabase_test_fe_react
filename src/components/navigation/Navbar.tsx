@@ -85,9 +85,8 @@ const Navbar = () => {
 
       {/* Menú principal */}
       <div
-        className={`bg-blue-600 p-2 ${
-          isMobileMenuOpen ? "block" : "hidden"
-        } sm:flex sm:items-center sm:justify-between`}
+        className={`bg-blue-600 p-2 ${isMobileMenuOpen ? "block" : "hidden"
+          } sm:flex sm:items-center sm:justify-between`}
       >
         <nav className="relative w-full">
           <ul className="flex flex-col sm:flex-row sm:space-x-1 text-sm font-semibold">
@@ -121,11 +120,14 @@ const Navbar = () => {
                         Configuración
                       </Link>
                     </li>
-                    <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
-                      <Link className="block w-full h-full" to="/AdmRol">
-                        Roles
-                      </Link>
-                    </li>
+                    {/* Condición para “Roles” exclusivamente super_admin */}
+                    {roles === "super_admin" && (
+                      <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
+                        <Link className="block w-full h-full" to="/AdmRol">
+                          Roles
+                        </Link>
+                      </li>
+                    )}
                     <li className="hover:bg-gray-200 px-4 py-2" onClick={handleNavClick}>
                       <Link className="block w-full h-full" to="/AdmUsuarios">
                         Usuarios
