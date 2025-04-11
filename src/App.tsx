@@ -14,12 +14,14 @@ import MainLayout from "./components/layouts/MainLayout";
 import NotFound from "./pages/dashboard/NotFound";
 import UpdateDigitalCertificate from "./pages/Certificate/UpdateCertificate";
 import Roles from "./pages/dashboard/Roles";
+import Register from "./pages/auth/SignUp";
 
 export default function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Register />} />
 
         {/* Rutas dentro de MainLayout */}
         <Route element={<MainLayout />}>
