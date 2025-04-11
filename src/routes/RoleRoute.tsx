@@ -13,7 +13,7 @@ export default function RoleRoute({ children }: RoleRouteProps) {
 
   // ⏳ Si aún está cargando la autenticación, muestra un mensaje temporal.
   if (loading || roles === null) {
-    return <div className="text-center mt-10">Cargando...</div>;
+    return
   }
 
   // ✅ Verifica si el rol tiene permiso para acceder a esta ruta

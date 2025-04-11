@@ -2,12 +2,19 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../navigation/Navbar';
 import Footer from '../footer/Footer';
 import { useAuth } from '../../context/AuthContext';
+import Loader from '../ui/Loader';
 
 const MainLayout = () => {
     const { session, loading } = useAuth();
 
+    // Forzar loading si estás en modo desarrollo
+    // const devAlwaysLoading = import.meta.env.DEV;
+
+    // if (loading || devAlwaysLoading) {
+    //     return <Loader />;
+    // }
     if (loading) {
-        return <div className="text-center mt-10 text-lg font-semibold">Cargando...</div>;
+        return <Loader />;
     }
 
     return (
