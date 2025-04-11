@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
-import usePagination from "../../hooks/usePagination";
+// ¡Ya no necesitamos 'usePagination', lo retiramos!
+// import usePagination from "../../hooks/usePagination";
 import Pagination from '../../components/ui/Pagination';
 import Filters from "../../components/ui/Filters";
 import ModalOpciones from "../../components/ModalOpciones";
 import ModalXml from "../../components/ModalXml";
 import { tipoDocumentoOptions } from '../../utils/documentTypes'
+
 interface EmisionComprobante {
   id: number;
   emisor_rnc: string;
@@ -47,91 +49,168 @@ interface EmisionComprobante {
 
 const EmisionComprobantes: React.FC = () => {
   const { roles } = useAuth();
+
+  // Estado principal para guardar los comprobantes
   const [comprobantes, setComprobantes] = useState<EmisionComprobante[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Paginación: página actual, total de items y items por página
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 10;
+
+  // Estados para filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [rncReceptor, setRncReceptor] = useState("");
   const [tipoDocumento, setTipoDocumento] = useState("Todos");
+  const [estado, setEstado] = useState("Todos");
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
+
+  // Estados para modales
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFactura, setSelectedFactura] = useState<EmisionComprobante | null>(null);
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [isXmlModalOpen, setIsXmlModalOpen] = useState(false);
-  const [estado, setEstado] = useState("Todos");
-  const [fechaDesde, setFechaDesde] = useState("");
-  const [fechaHasta, setFechaHasta] = useState("");
-  const itemsPerPage = 10;
 
+  // Se cargan comprobantes cuando se tenga un rol válido
   useEffect(() => {
     if (roles === "super_admin" || roles === "admin" || roles === "user") {
-      fetchComprobantes();
+      // Inicia en la página 1
+      setCurrentPage(1);
+      fetchComprobantes(1);
     } else {
       setLoading(false);
     }
   }, [roles]);
 
-  const fetchComprobantes = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("emision_comprobantes")
-      .select(`
-        "id","emisor_rnc", "emisor_razon_social", "receptor_rnc", "receptor_razon_social", 
-        "numero_documento", "tipo_documento", "tipo_ecf", "es_rfc", "fecha_emision", 
-        "subtotal_sin_impuestos", "total_impuesto", "itbis", "importe_total", 
-        "dgii_filename", "dgii_estado", "dgii_mensaje_respuesta", "track_id", 
-        "fecha_autorizacion", "fecha_firma", "codigo_seguridad", "url_consulta_qr", 
-        "document_xml", "acuse_recibo_estado", "acuse_recibo_json", 
-        "aprobacion_comercial_estado", "aprobacion_comercial_json", 
-        "numero_documento_sustento", "secuencial_erp", "codigo_erp", "usuario_erp", 
-        "fecha_reproceso", "destinatarios", "created_at", "rfc_xml"
-      `);
-
-    if (error) {
-      console.error("❌ Error al obtener los comprobantes:", error.message);
-    } else {
-      setComprobantes(data);
+  // Cada vez que un filtro cambie, vuelve a la página 1 y recarga
+  useEffect(() => {
+    if (roles === "super_admin" || roles === "admin" || roles === "user") {
+      setCurrentPage(1);
+      fetchComprobantes(1);
     }
-    setLoading(false);
+  }, [searchTerm, rncReceptor, tipoDocumento, estado, fechaDesde, fechaHasta]);
+
+  /**
+   * Trae los comprobantes desde Supabase, usando `.range(from, to)`
+   * y `count: 'exact'` para saber el total.
+   */
+  const fetchComprobantes = async (page: number) => {
+    setLoading(true);
+    try {
+      // Calculamos el rango de la página
+      const from = (page - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      // Construimos la query base
+      let query = supabase
+        .from("emision_comprobantes")
+        .select(
+          `
+          id,
+          emisor_rnc,
+          emisor_razon_social,
+          receptor_rnc,
+          receptor_razon_social,
+          numero_documento,
+          tipo_documento,
+          tipo_ecf,
+          es_rfc,
+          fecha_emision,
+          subtotal_sin_impuestos,
+          total_impuesto,
+          itbis,
+          importe_total,
+          dgii_filename,
+          dgii_estado,
+          dgii_mensaje_respuesta,
+          track_id,
+          fecha_autorizacion,
+          fecha_firma,
+          codigo_seguridad,
+          url_consulta_qr,
+          document_xml,
+          acuse_recibo_estado,
+          acuse_recibo_json,
+          aprobacion_comercial_estado,
+          aprobacion_comercial_json,
+          numero_documento_sustento,
+          secuencial_erp,
+          codigo_erp,
+          usuario_erp,
+          fecha_reproceso,
+          destinatarios,
+          created_at,
+          rfc_xml
+        `,
+          { count: "exact" }
+        );
+
+      // Aplicar filtros:
+      if (searchTerm) {
+        query = query.ilike("numero_documento", `%${searchTerm}%`);
+      }
+      if (rncReceptor) {
+        query = query.ilike("receptor_rnc", `%${rncReceptor}%`);
+      }
+      if (tipoDocumento !== "Todos") {
+        query = query.eq("tipo_documento", tipoDocumento);
+      }
+      if (estado !== "Todos") {
+        query = query.ilike("dgii_estado", estado.toLowerCase());
+      }
+      if (fechaDesde) {
+        // Ejemplo: filtrar mayor/igual a
+        query = query.gte("fecha_emision", fechaDesde);
+      }
+      if (fechaHasta) {
+        // Ejemplo: filtrar menor/igual a
+        query = query.lte("fecha_emision", fechaHasta);
+      }
+
+      // Definir el rango para la paginación
+      const { data, count, error } = await query.range(from, to);
+
+      if (error) {
+        console.error("❌ Error al obtener los comprobantes:", error.message);
+      } else {
+        // Guardar los datos en el estado
+        setComprobantes(data || []);
+
+        // Guardar total de registros para calcular páginas
+        if (count !== null) {
+          setTotalItems(count);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  {/* Filtros */ }
-  const filteredComprobantes = comprobantes.filter((item) => {
-    const fechaEmision = new Date(item.fecha_emision);
-    const desde = fechaDesde ? new Date(fechaDesde) : null;
-    const hasta = fechaHasta ? new Date(fechaHasta) : null;
-    return (
-      (!searchTerm || item.numero_documento.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (!rncReceptor || item.receptor_rnc.includes(rncReceptor)) &&
-      (tipoDocumento === "Todos" || item.tipo_documento === tipoDocumento) &&
-      (estado === "Todos" || item.dgii_estado.toLowerCase() === estado.toLowerCase()) &&
-      (!desde || fechaEmision >= desde) &&
-      (!hasta || fechaEmision <= hasta)
-    );
-  });
-
-  const { paginatedData: paginatedComprobantes, currentPage, setCurrentPage } =
-    usePagination({
-      data: filteredComprobantes,
-      itemsPerPage,
-    });
-
-  const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>, factura: EmisionComprobante) => {
+  // Abre modal de opciones
+  const handleToggleModal = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    factura: EmisionComprobante
+  ) => {
     event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
-
     setSelectedFactura(factura);
-    setModalPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
+    setModalPosition({
+      top: rect.bottom + window.scrollY + 5,
+      left: rect.left + window.scrollX,
+    });
     setIsModalOpen(true);
   };
 
-  // Callback para abrir el modal XML desde ModalOpciones
+  // Callback para abrir modal XML
   const handleShowXml = () => {
     setIsXmlModalOpen(true);
   };
 
-
   return (
     <div className="">
-      {/* Componente de Filtros */}
+      {/* Filtros */}
       <Filters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -146,12 +225,10 @@ const EmisionComprobantes: React.FC = () => {
         setFechaDesde={setFechaDesde}
         fechaHasta={fechaHasta}
         setFechaHasta={setFechaHasta}
-        fetchComprobantes={fetchComprobantes}
+        fetchComprobantes={() => fetchComprobantes(1)} // si deseas refrescar
       />
 
-      {/* Modal */}
-
-      {/* Modal de opciones */}
+      {/* Modales */}
       <ModalOpciones
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -160,7 +237,6 @@ const EmisionComprobantes: React.FC = () => {
         onShowXml={handleShowXml}
       />
 
-      {/* Modal XML */}
       <ModalXml
         isOpen={isXmlModalOpen}
         onClose={() => setIsXmlModalOpen(false)}
@@ -199,26 +275,19 @@ const EmisionComprobantes: React.FC = () => {
                   <th className="p-2 border border-gray-700 min-w-[150px]">Fecha Reproceso</th>
                   <th className="p-2 border border-gray-700 min-w-[150px]">Destinatarios</th>
                   <th className="p-2 border border-gray-700 min-w-[150px]">Acuse Recibo Estado</th>
-                  {/* <th className="p-2 border border-gray-700 min-w-[150px]">Tipo ECF</th> */}
-                  {/* <th className="p-2 border border-gray-700 min-w-[150px]">Es RFC</th> */}
-                  {/* <th className="p-2 border border-gray-700 min-w-[150px]">DGII Filename</th> */}
-                  {/* <th className="p-2 border border-gray-700">Fecha Firma</th> */}
-                  {/* <th className="p-2 border border-gray-700">Código Seguridad</th> */}
-                  {/* <th className="p-2 border border-gray-700">URL Consulta QR</th> */}
-                  {/* <th className="p-2 border border-gray-700">Documento XML</th> */}
-                  {/* <th className="p-2 border border-gray-700">Acuse Recibo JSON</th> */}
-                  {/* <th className="p-2 border border-gray-700">Aprobación Comercial Estado</th> */}
-                  {/* <th className="p-2 border border-gray-700">Aprobación Comercial JSON</th> */}
-                  {/* <th className="p-2 border border-gray-700">Número Documento Sustento</th> */}
-                  {/* <th className="p-2 border border-gray-700">Fecha Creación</th> */}
-                  {/* <th className="p-2 border border-gray-700">RFC XML</th> */}
+                  {/* Aquí los <th> comentados siguen, si deseas */}
                 </tr>
               </thead>
               <tbody>
-                {paginatedComprobantes.map((item) => (
+                {comprobantes.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-100 border-b">
                     <td className="p-3 text-center">
-                      <button onClick={(event) => handleToggleModal(event, item)} className="text-xl">...</button>
+                      <button
+                        onClick={(event) => handleToggleModal(event, item)}
+                        className="text-xl"
+                      >
+                        ...
+                      </button>
                     </td>
                     <td className="p-2 border">{item.emisor_rnc}</td>
                     <td className="p-2 border truncate">{item.emisor_razon_social}</td>
@@ -236,24 +305,11 @@ const EmisionComprobantes: React.FC = () => {
                     <td className="p-2 border">{item.track_id}</td>
                     <td className="p-2 border">{item.secuencial_erp}</td>
                     <td className="p-2 border">{item.codigo_erp}</td>
-                    <td className="p-2 border">{item.usuario_erp}</td>
+                    <td className="p-2 border">{String(item.usuario_erp)}</td>
                     <td className="p-2 border truncate">{item.dgii_mensaje_respuesta}</td>
                     <td className="p-2 border">{item.fecha_reproceso}</td>
                     <td className="p-2 border">{item.destinatarios}</td>
                     <td className="p-2 border">{item.acuse_recibo_estado}</td>
-                    {/* <td className="p-2 border">{item.tipo_ecf}</td> */}
-                    {/* <td className="p-2 border">{item.es_rfc }</td> */}
-                    {/* <td className="p-2 border">{item.dgii_filename}</td> */}
-                    {/* <td className="p-2 border">{item.fecha_firma}</td> */}
-                    {/* <td className="p-2 border">{item.codigo_seguridad}</td> */}
-                    {/* <td className="p-2 border">{item.url_consulta_qr}</td> */}
-                    {/* <td className="p-2 border truncate">{item.document_xml}</td> */}
-                    {/* <td className="p-2 border truncate">{item.acuse_recibo_json}</td> */}
-                    {/* <td className="p-2 border">{item.aprobacion_comercial_estado}</td> */}
-                    {/* <td className="p-2 border truncate">{item.aprobacion_comercial_json}</td> */}
-                    {/* <td className="p-2 border">{item.numero_documento_sustento}</td> */}
-                    {/* <td className="p-2 border">{item.created_at}</td> */}
-                    {/* <td className="p-2 border">{item.rfc_xml}</td> */}
                   </tr>
                 ))}
               </tbody>
@@ -263,9 +319,12 @@ const EmisionComprobantes: React.FC = () => {
           {/* Componente de Paginación */}
           <Pagination
             currentPage={currentPage}
-            totalItems={filteredComprobantes.length}
+            totalItems={totalItems} // NUEVO: totalItems viene de la DB
             itemsPerPage={itemsPerPage}
-            onPageChange={setCurrentPage}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              fetchComprobantes(page);
+            }}
           />
         </>
       )}
