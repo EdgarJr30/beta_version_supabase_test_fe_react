@@ -4,7 +4,7 @@ import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
 import Pagination from '../../components/ui/Pagination';
 import Filters from "../../components/ui/Filters";
-import ModalOpciones from "../../components/ModalOpciones";
+// import ModalOpciones from "../../components/ModalOpciones";
 import { tipoDocumentoOptions } from '../../utils/documentTypes'
 
 interface RecepcionComprobante {
@@ -52,9 +52,9 @@ const AprobacionComprobantes: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [rncReceptor, setRncReceptor] = useState("");
     const [tipoDocumento, setTipoDocumento] = useState("Todos");
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedFactura, setSelectedFactura] = useState<RecepcionComprobante | null>(null);
-    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [selectedFactura, setSelectedFactura] = useState<RecepcionComprobante | null>(null);
+    // const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
     const [estado, setEstado] = useState("Todos");
     const [fechaDesde, setFechaDesde] = useState("");
     const [fechaHasta, setFechaHasta] = useState("");
@@ -71,7 +71,6 @@ const AprobacionComprobantes: React.FC = () => {
         }
     }, [roles]);
 
-    // TODO: Actualizar a la tabla de aprobacion comercial
     const fetchComprobantes = async () => {
         setLoading(true);
         const { data, error } = await supabase
@@ -117,14 +116,14 @@ const AprobacionComprobantes: React.FC = () => {
             itemsPerPage,
         });
 
-    const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>, factura: RecepcionComprobante) => {
-        event.stopPropagation();
-        const rect = event.currentTarget.getBoundingClientRect();
+    // const handleToggleModal = (event: React.MouseEvent<HTMLButtonElement>, factura: RecepcionComprobante) => {
+    //     event.stopPropagation();
+    //     const rect = event.currentTarget.getBoundingClientRect();
 
-        setSelectedFactura(factura);
-        setModalPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
-        setIsModalOpen(true);
-    };
+    //     setSelectedFactura(factura);
+    //     setModalPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
+    //     setIsModalOpen(true);
+    // };
 
     // NUEVO: Botones de ejemplo (PDF, XML, Aprobación Comercial)
     // Estas funciones son de ejemplo; ajusta la lógica según tus necesidades.
@@ -184,12 +183,12 @@ const AprobacionComprobantes: React.FC = () => {
             />
 
             {/* Modal de opciones */}
-            <ModalOpciones
+            {/* <ModalOpciones
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 urlConsultaQR={selectedFactura?.url_consulta_qr ?? null}
                 position={modalPosition}
-            />
+            /> */}
 
             {/* Loader */}
             {loading ? (
@@ -206,7 +205,7 @@ const AprobacionComprobantes: React.FC = () => {
                                     <th className="p-2 border border-gray-700">XML</th>
                                     <th className="p-2 border border-gray-700">Aprob. Comercial</th>
 
-                                    <th className="p-2 border border-gray-700 min-w-[60px]">Acciones</th>
+                                    {/* <th className="p-2 border border-gray-700 min-w-[60px]">Acciones</th> */}
                                     <th className="p-2 border border-gray-700 min-w-[120px]">RNC Emisor</th>
                                     <th className="p-2 border border-gray-700 min-w-[150px]">Razón Social Emisor</th>
                                     <th className="p-2 border border-gray-700 min-w-[120px]">RNC Receptor</th>
@@ -265,9 +264,9 @@ const AprobacionComprobantes: React.FC = () => {
                                                 Aprobación
                                             </button>
                                         </td>
-                                        <td className="p-3 text-center">
+                                        {/* <td className="p-3 text-center">
                                             <button onClick={(event) => handleToggleModal(event, item)} className="text-xl">...</button>
-                                        </td>
+                                        </td> */}
                                         <td className="p-2 border">{item.emisor_rnc}</td>
                                         <td className="p-2 border truncate">{item.emisor_razon_social}</td>
                                         <td className="p-2 border">{item.receptor_rnc}</td>
