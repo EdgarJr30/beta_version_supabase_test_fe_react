@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AppVersion from '../../components/AppVersion';
+import { useNotification } from "../../context/NotificationProvider";
 import TurnstileCaptcha from '../../components/TurnstileCaptcha';
 import { forgotPassword } from '../../utils/forgotPassword';
 
@@ -13,6 +14,7 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    const { notifyToast, notifySwal } = useNotification();
 
     useEffect(() => {
         if (session) {
@@ -26,14 +28,16 @@ export default function Login() {
 
         // Validar que el usuario haya completado el captcha
         if (!import.meta.env.DEV && !captchaToken) {
-            setError("Por favor, completa el CAPTCHA antes de iniciar sesión.");
+            notifyToast("Por favor, completa el CAPTCHA antes de iniciar sesión.", "error");
             return;
         }
 
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
-            setError(error.message);
+            // setError(error.message);
+            notifyToast("Invalid login credentials", "error");
+
         }
         else {
             console.log("Inicio de sesión exitoso con Captcha:", captchaToken);
@@ -45,15 +49,15 @@ export default function Login() {
         setError('');
 
         if (!email) {
-            setError("Por favor, ingresa tu correo primero.");
+            notifyToast("Por favor, ingresa tu correo primero.", "error");
             return;
         }
 
         const { success, error: forgotError } = await forgotPassword(email);
         if (!success) {
-            setError(forgotError || "Error al enviar el enlace de recuperación.");
+            notifyToast(`${forgotError}` || "Error al enviar el enlace de recuperación.", "error");
         } else {
-            alert("Se ha enviado un enlace de recuperación a tu correo.");
+            notifyToast("Se ha enviado un enlace de recuperación a tu correo.", "success");
         }
     };
 
