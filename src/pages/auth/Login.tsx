@@ -14,7 +14,7 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-    const { notifyToast, notifySwal } = useNotification();
+    const { notifyToast } = useNotification();
 
     useEffect(() => {
         if (session) {
