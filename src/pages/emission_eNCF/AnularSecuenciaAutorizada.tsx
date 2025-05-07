@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
+import { useNotification } from "../../context/NotificationProvider";
 import Pagination from "../../components/ui/Pagination";
 import { tipoDocumentoOptions } from "../../utils/documentTypes";
 
@@ -39,6 +40,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     const { roles } = useAuth();
     const [anulaciones, setAnulaciones] = useState<Anulacion[]>([]);
     const [loading, setLoading] = useState(true);
+    const { notifyToast } = useNotification();
 
     // Filtros y búsqueda
     const [tipoDocumento, setTipoDocumento] = useState("");
@@ -91,7 +93,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
         try {
             const { data, error } = await supabase.from("ancef").select("*");
             if (error) {
-                console.error("❌ Error fetching anulaciones:", error.message);
+                notifyToast(`❌ Error fetching anulaciones ${error.message}`, "error");
             } else {
                 setAnulaciones(data || []);
             }
@@ -123,14 +125,12 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     const handleAgregar = () => {
         // Validar que se haya seleccionado un tipo de documento y se hayan ingresado los secuenciales
         if (!tipoDocumento || !secuencialDesde.trim() || !secuencialHasta.trim()) {
-            alert(
-                "Por favor ingresa todos los datos (tipo de documento, secuencial desde y secuencial hasta) para agregar."
-            );
+            notifyToast(`Por favor ingresa todos los datos (tipo de documento, secuencial desde y secuencial hasta) para agregar.`, "error");
             return;
         }
         const prefix = comprobantePrefix[tipoDocumento];
         if (!prefix) {
-            alert("Tipo de documento no válido");
+            notifyToast(`Tipo de documento no válido`, "error");
             return;
         }
         const fullDesde = prefix + padWithZeros(secuencialDesde);
@@ -175,7 +175,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     const handleGuardarEdit = () => {
         const prefix = comprobantePrefix[editValues.tipo_documento];
         if (!prefix) {
-            console.error("Tipo de documento no válido");
+            notifyToast(`Tipo de documento no válido`, "error");
             return;
         }
         const fullDesde = prefix + padWithZeros(editValues.secuencial_desde);
@@ -203,7 +203,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     // Handler para emitir (enviar) las anulaciones al backend
     const handleEmitir = async () => {
         if (nuevasAnulaciones.length === 0) {
-            alert("No hay datos agregados para emitir.");
+            notifyToast(`No hay datos agregados para emitir.`, "error");
             return;
         }
         try {
@@ -240,10 +240,10 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                 .select(); // Devuelve las filas insertadas
 
             if (error) {
-                console.error("❌ Error al insertar anulación:", error.message);
-                alert("Error al emitir anulación: " + error.message);
+                notifyToast(`❌ Error al insertar anulación ${error.message}`, "error");
             } else {
-                console.log("✅ Anulación insertada:", data);
+                notifyToast(`Anulación insertada ${data}`, "success");
+
                 // Actualiza la lista de anulaciones tras el insert
                 await fetchAnulaciones();
                 // Limpia las nuevas anulaciones y cierra el modal
@@ -251,8 +251,8 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                 handleCloseModal();
             }
         } catch (e: unknown) {
-            console.error("❌ Error general al emitir anulación:", e);
-            alert("Error general: " + String(e));
+            notifyToast(`❌ Error general al emitir anulación ${e}`, "error");
+            // alert("Error general: " + String(e));
         }
     };
 
