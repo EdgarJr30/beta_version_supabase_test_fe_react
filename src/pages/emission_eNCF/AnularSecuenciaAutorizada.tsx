@@ -41,6 +41,7 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     const [anulaciones, setAnulaciones] = useState<Anulacion[]>([]);
     const [loading, setLoading] = useState(true);
     const { notifyToast } = useNotification();
+    const [botonError, setBotonError] = useState(false);
 
     // Filtros y búsqueda
     const [tipoDocumento, setTipoDocumento] = useState("");
@@ -125,7 +126,11 @@ const AnularSecuenciaAutorizada: React.FC = () => {
     const handleAgregar = () => {
         // Validar que se haya seleccionado un tipo de documento y se hayan ingresado los secuenciales
         if (!tipoDocumento || !secuencialDesde.trim() || !secuencialHasta.trim()) {
+            setBotonError(true); // Activa clase de error
             notifyToast(`Por favor ingresa todos los datos (tipo de documento, secuencial desde y secuencial hasta) para agregar.`, "error");
+
+            // Desactiva el efecto luego de un corto tiempo
+            setTimeout(() => setBotonError(false), 500);
             return;
         }
         const prefix = comprobantePrefix[tipoDocumento];
@@ -368,7 +373,10 @@ const AnularSecuenciaAutorizada: React.FC = () => {
                             <div className="flex items-center space-x-2">
                                 <button
                                     onClick={handleAgregar}
-                                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                                    className={`px-3 py-1 rounded text-white transition-all duration-300 ${botonError
+                                            ? "bg-red-600 shake"
+                                            : "bg-blue-500 hover:bg-blue-600"
+                                        }`}
                                 >
                                     Agregar
                                 </button>
