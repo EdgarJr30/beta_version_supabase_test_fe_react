@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import usePagination from "../../hooks/usePagination";
+import { useNotification } from "../../context/NotificationProvider";
 import Pagination from "../../components/ui/Pagination";
 import { format } from "date-fns";
 
@@ -16,6 +17,8 @@ const Roles: React.FC = () => {
   const { roles } = useAuth();
   const [rolesData, setRolesData] = useState<Rol[]>([]);
   const [loading, setLoading] = useState(true);
+  const { notifyToast } = useNotification();
+
 
   // Modal para CREAR
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -63,7 +66,7 @@ const Roles: React.FC = () => {
         .from("roles")
         .select("*");
       if (error) {
-        console.error("❌ Error fetching roles:", error.message);
+        notifyToast(`❌ Error fetching roles ${error.message}`, "error");
       } else {
         setRolesData(data || []);
       }
@@ -88,7 +91,7 @@ const Roles: React.FC = () => {
 
   const handleCreateRole = async () => {
     if (roles !== "super_admin" && roles !== "admin") {
-      setCreateError("No tienes permisos para crear roles.");
+      notifyToast(`❌ No tienes permisos para crear roles.`, "error");
       return;
     }
 
@@ -105,14 +108,14 @@ const Roles: React.FC = () => {
 
       if (error) {
         setCreateError(error.message);
-        console.error("❌ Error al insertar rol:", error.message);
+        notifyToast(`❌ Error al insertar rol ${error.message}`, "error");
       } else {
-        console.log("✅ Rol creado:", data);
+        notifyToast(`Rol creado ${data}`, "success");
         await fetchRoles();
         closeCreateModal();
       }
     } catch (e: unknown) {
-      console.error("❌ Error general al crear rol:", e);
+      notifyToast(`❌ Error general al crear rol ${e}`, "error");
       setCreateError(String(e));
     }
   };
@@ -122,7 +125,7 @@ const Roles: React.FC = () => {
   ======================== */
   const openEditModal = (role: Rol) => {
     if (roles !== "super_admin" && roles !== "admin") {
-      alert("No tienes permisos para editar roles.");
+      notifyToast(`❌ No tienes permisos para editar roles.`, "error");
       return;
     }
     setEditRole(role);
@@ -139,11 +142,11 @@ const Roles: React.FC = () => {
 
   const handleUpdateRole = async () => {
     if (roles !== "super_admin" && roles !== "admin") {
-      setEditError("No tienes permisos para editar roles.");
+      notifyToast(`❌ No tienes permisos para editar roles.`, "error");
       return;
     }
     if (!editRole) {
-      setEditError("No hay rol seleccionado para editar.");
+      notifyToast(`No hay rol seleccionado para editar.`, "error");
       return;
     }
 
@@ -159,14 +162,15 @@ const Roles: React.FC = () => {
 
       if (error) {
         setEditError(error.message);
-        console.error("❌ Error al editar rol:", error.message);
+        notifyToast(`❌ Error al editar rol ${error.message}`, "error");
       } else {
-        console.log("✅ Rol actualizado:", data);
+        notifyToast(`Rol actualizado ${data}`, "success");
+
         await fetchRoles();
         closeEditModal();
       }
     } catch (e: unknown) {
-      console.error("❌ Error general al actualizar rol:", e);
+      notifyToast(`❌ Error general al actualizar rol ${e}`, "error");
       setEditError(String(e));
     }
   };
@@ -176,11 +180,10 @@ const Roles: React.FC = () => {
   ======================== */
   const openDeleteModal = (role: Rol) => {
     if (roles !== "super_admin" && roles !== "admin") {
-      alert("No tienes permisos para eliminar roles.");
+      notifyToast(`❌ No tienes permisos para eliminar roles.`, "error");
       return;
     }
     setDeleteRole(role);
-    setDeleteError("");
     setShowDeleteModal(true);
   };
 
@@ -191,11 +194,11 @@ const Roles: React.FC = () => {
 
   const handleDeleteRole = async () => {
     if (roles !== "super_admin" && roles !== "admin") {
-      setDeleteError("No tienes permisos para eliminar roles.");
+      notifyToast(`❌ No tienes permisos para eliminar roles.`, "error");
       return;
     }
     if (!deleteRole) {
-      setDeleteError("No hay rol seleccionado para eliminar.");
+      notifyToast(`❌ No hay rol seleccionado para eliminar.`, "error");
       return;
     }
 
@@ -208,14 +211,14 @@ const Roles: React.FC = () => {
 
       if (error) {
         setDeleteError(error.message);
-        console.error("❌ Error al eliminar rol:", error.message);
+        notifyToast(`❌ Error al eliminar rol ${error.message}`, "error");
       } else {
-        console.log("✅ Rol eliminado:", data);
+        notifyToast(`Rol eliminado ${data}`, "success");
         await fetchRoles();
         closeDeleteModal();
       }
     } catch (e: unknown) {
-      console.error("❌ Error general al eliminar rol:", e);
+      notifyToast(`❌ Error general al eliminar rol ${e}`, "error");
       setDeleteError(String(e));
     }
   };
